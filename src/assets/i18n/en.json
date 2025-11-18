@@ -1,0 +1,177 @@
+{
+  "dashboard": {
+    "addNewCrop": "Add New Crop",
+    "view_tasks": "View Tasks",
+    "crop_name": "Crop name",
+    "task": "Task",
+    "due_date": "Due Date",
+    "actions": "Actions",
+    "recommendatios": "Lastest Recommendations"
+  },
+
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "manageCrops": "Manage Crops",
+    "myFields": "My Fields",
+    "myTasks": "My Tasks",
+    "community": "Community"
+  },
+  "header": {
+    "profile": "Profile",
+    "logout": "Log Out"
+  },
+  "profile": {
+    "title": "My Profile",
+    "personalInfo": "Personal Information",
+    "changePassword": "Change Password",
+    "settings": "Settings",
+    "name": "Name",
+    "email": "E-mail",
+    "phoneNumber": "Phone Number",
+    "identityDocument": "Identity Document",
+    "editInfo": "Edit Information",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "notifications": "Notifications",
+    "location": "Location",
+    "logout": "Log Out",
+    "deleteAccount": "Delete Account",
+    "deleteConfirmHeader": "Deletion Confirmation",
+    "deleteConfirmMessage": "Are you sure you want to delete your account? This action is irreversible.",
+    "deleteAccept": "Yes, delete",
+    "deleteReject": "No, cancel"
+  },
+  "toast": {
+    "profileUpdated": "Profile updated.",
+    "passwordChanged": "Password changed.",
+    "logoutSuccess": "You have logged out successfully.",
+    "accountDeleted": "Account deleted.",
+    "errorProfileUpdate": "Could not update profile.",
+    "errorPasswordChange": "Could not change password.",
+    "errorDeleteAccount": "Could not delete account."
+  },
+  "errors": {
+    "nameLength": "Name must be at least 3 characters long.",
+    "phoneDigits": "Phone number must have 9 digits.",
+    "documentDigits": "Document must have 8 digits.",
+    "requiredCurrentPass": "Current password is required.",
+    "newPassLength": "New password must be at least 8 characters.",
+    "passwordsDontMatch": "Passwords do not match."
+  },
+  "manageCrops": {
+    "title": "Manage Crops",
+    "description": "Manage your crops, add new records and keep track of the current status of your plantations.",
+    "totalCrops": "Total Crops",
+    "healthy": "Healthy",
+    "attention": "Attention",
+    "critical": "Critical",
+    "crop": "Crop",
+    "plantingDate": "Planting Date",
+    "harvestDate": "Harvest Date",
+    "field": "Field",
+    "status": "Status",
+    "days": "Days",
+    "actions": "Actions",
+    "newCrop": "New Crop",
+    "editCrop": "Edit Crop",
+    "deleteCrop": "Delete Crop",
+    "confirmDelete": "Confirm",
+    "confirmDeleteMessage": "Are you sure you want to delete the crop",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "create": "Create",
+    "update": "Update",
+    "cropName": "Crop",
+    "cropNamePlaceholder": "E.g: Wheat, Corn, Tomato...",
+    "plantingDatePlaceholder": "DD/MM",
+    "harvestDatePlaceholder": "DD/MM",
+    "fieldPlaceholder": "Field name",
+    "daysPlaceholder": "E.g: 31",
+    "selectStatus": "Select status",
+    "statusHealthy": "Healthy",
+    "statusAttention": "Attention",
+    "statusCritical": "Critical",
+    "loadingCrops": "Loading crops...",
+    "retry": "Retry",
+    "cropCreated": "Crop created successfully",
+    "cropUpdated": "Crop updated successfully",
+    "cropDeleted": "Crop deleted successfully",
+    "errorCreateCrop": "Could not create crop",
+    "errorUpdateCrop": "Could not update crop",
+    "errorDeleteCrop": "Could not delete crop",
+    "errorLoadCrops": "Could not load crops",
+    "validation": {
+      "cropNameRequired": "Crop name is required",
+      "plantingDateRequired": "Planting date is required",
+      "harvestDateRequired": "Harvest date is required",
+      "fieldRequired": "Field is required",
+      "statusRequired": "Status is required",
+      "daysRequired": "Days are required"
+    }
+  },
+  "registerCrop": {
+    "title": "Register a Crop",
+    "subtitle": "Add new crop",
+    "cropInformation": "Crop information",
+    "chooseField": "Choose your field",
+    "cropTypePlaceholder": "Crop type / species",
+    "plantingDatePlaceholder": "DD/MM/YY",
+    "harvestDatePlaceholder": "DD/MM/YY",
+    "soilTypePlaceholder": "Soil Type",
+    "sunlightPlaceholder": "Sunlight",
+    "wateringPlaceholder": "Watering frequency",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "fields": {
+    "title": "My fields",
+    "description": "Manage your fields in this section!"
+  },
+  "field_detail": {
+    "location": "Location: ",
+    "field_size": "Field Size: ",
+    "crop": "Crop: ",
+    "days_since": "Days since planting: ",
+    "planting_date": "Planting Date: ",
+    "expected": "Expected Harvest Date: ",
+    "soil_type": "Soil Type: ",
+    "watering": "Watering: ",
+    "sunlight": "Sunlight: ",
+    "progress": {
+      "title": "Progress & History",
+      "watered": "Watered: ",
+      "fertilized": "Fertilized: ",
+      "pest": "Pest Inspection: "
+    },
+    "tasks": "My Tasks"
+  },
+  "new_field": {
+    "title": "New Field",
+    "description": "Add a new field to your list!",
+    "image": "Click to upload image",
+    "name": "Field Name",
+    "location": "Location",
+    "size": "Field Size",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving"
+  },
+  "modifications": {
+    "progress": "Edit Progress & History",
+    "new_task": "Add New Task",
+    "date": "Due Date",
+    "description": "Task Description"
+  },
+  "task":{
+    "description": "Description",
+    "origin": "Organize your daily tasks. Mark completed tasks."
+  },
+  "community": {
+    "title": "What Our Community Says",
+    "description": "Real feedback from real users who have transformed their workflow with our application. Join thousands of satisfied customers worldwide.",
+    "quantity": "Comments"
+  }
+}

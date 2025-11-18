@@ -1,0 +1,279 @@
+/* src/assets/styles/global.css */
+
+/*
+  Asegúrate de que este archivo se importa DESPUÉS de los estilos de PrimeVue y Aura
+  en main.js para que las sobreescrituras funcionen.
+*/
+
+/* ------------------------------------------- */
+/* 1. Variables Globales (Aura Theme Overrides) */
+/* ------------------------------------------- */
+/*
+  Las variables de Aura (o cualquier tema de PrimeVue) están definidas con un prefijo 'p'
+  (ej. --p-primary-500). Puedes encontrarlas en la documentación o inspeccionando elementos.
+  Aquí sobrescribimos las que se acercan más a tu imagen.
+*/
+:root {
+    --p-primary-500: #a8bfa8;
+    --p-primary-50: #E6EFE3;
+    --p-primary-color-text: #ffffff;
+    --p-surface-card: #ffffff;
+    --p-surface-ground: #ffffff;
+    --p-surface-text: #333333;
+    --p-text-color: #333333;
+    --p-text-muted-color: #5d5d5d;
+    --p-content-border-color: #e0e0e0;
+    --p-focus-ring: 0 0 0 0.2rem rgba(106, 153, 78, 0.25);
+    --sidebar-width: 280px; /* Ancho de la sidebar */
+    font-size: 16px;
+}
+
+/* ------------------------------------------- */
+/* 2. Estilos Específicos para Componentes */
+/* ------------------------------------------- */
+
+/* Estilos para el body */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: var(--p-surface-ground);
+}
+
+/* Sidebar Styling (ajustando las clases de PrimeFlex) */
+.flex.h-full.p-3.shadow-2 { /* Clases del aside en sidebar.component.vue */
+    background-color: var(--p-primary-500) !important; /* Color de fondo de la sidebar */
+    color: var(--p-primary-color-text); /* Color del texto dentro de la sidebar */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    min-width: 250px; /* Ancho fijo para la sidebar */
+}
+
+.sidebar .flex.align-items-center.mb-5 { /* Logo y nombre de la app */
+    padding: 0 1rem; /* Ajuste del padding para el logo */
+}
+
+.sidebar .list-none a { /* Estilos para los enlaces de navegación */
+    color: var(--p-primary-color-text); /* Texto de los enlaces */
+    font-weight: normal; /* Asegura que no sea negrita por defecto */
+    border-radius: 0 !important; /* Sin bordes redondeados en los ítems */
+}
+
+.sidebar .list-none a .pi { /* Iconos de la sidebar */
+    color: var(--p-primary-color-text); /* Color de los iconos */
+    font-size: 1.2rem; /* Tamaño de los iconos */
+}
+
+/* Estado activo de los elementos de la sidebar */
+.sidebar .list-none a.bg-primary {
+    background-color: rgba(0, 0, 0, 0.2) !important; /* Fondo del ítem activo */
+    color: var(--p-primary-color-text) !important;
+}
+
+.sidebar .list-none a:hover:not(.bg-primary) {
+    background-color: rgba(255, 255, 255, 0.1) !important; /* Efecto hover */
+}
+
+
+/* Header Styling */
+header.p-3.shadow-1 { /* Clases del header en header.component.vue */
+    background-color: var(--p-surface-card) !important;
+    height: 70px; /* Altura fija para el header */
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem; /* Ajuste del padding */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Botones del Header (Perfil, Logout) */
+.user-actions .p-button.p-button-text {
+    color: var(--p-text-color) !important; /* Color de texto para los botones del header */
+    transition: color 0.3s ease;
+}
+.user-actions .p-button.p-button-text:hover {
+    color: var(--p-primary-500) !important; /* Color en hover */
+    background-color: transparent !important; /* Asegura que no haya fondo */
+}
+.user-actions .p-button .p-button-icon {
+    font-size: 1.2rem; /* Tamaño de los iconos */
+    margin-right: 0.5rem; /* Espacio entre icono y texto */
+}
+
+/* Language Switcher Styling (SelectButton) */
+.p-selectbutton {
+    border-radius: 5px; /* Bordes ligeramente redondeados */
+    overflow: hidden;
+}
+.p-selectbutton .p-button {
+    background-color: var(--p-surface-card); /* Fondo blanco por defecto */
+    color: var(--p-text-color); /* Texto gris */
+    border: 1px solid var(--p-content-border-color); /* Borde suave */
+    transition: all 0.2s ease;
+}
+.p-selectbutton .p-button.p-highlight { /* Botón activo */
+    background-color: var(--p-primary-500) !important; /* Fondo verde */
+    color: var(--p-primary-color-text) !important; /* Texto blanco */
+    border-color: var(--p-primary-500) !important;
+}
+.p-selectbutton .p-button:not(.p-highlight):hover {
+    background-color: var(--p-primary-50) !important; /* Fondo ligero en hover */
+    color: var(--p-text-color) !important;
+}
+
+/* Contenido Principal (dashboard y otras páginas) */
+main.p-4.flex-grow-1.overflow-y-auto {
+    background-color: #ffffff !important; /* Tu color específico para el contenido */
+}
+
+/* Card Styling (para las páginas de contenido) */
+.p-card {
+    border-radius: 10px; /* Bordes redondeados para las tarjetas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Sombra suave */
+}
+.p-card .p-card-title {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--p-content-border-color);
+    margin-bottom: 1rem;
+}
+
+/* ----------------------------------------------------------- */
+/* 4. Animación de la Sidebar con Transform (Solución Definitiva) */
+/* ----------------------------------------------------------- */
+
+/* Definimos el ancho de la sidebar como una variable para reutilizarla */
+:root {
+    --sidebar-width: 280px;
+}
+
+/* El layout principal necesita un posicionamiento relativo para que la sidebar se ancle a él */
+.main-layout {
+    position: relative;
+    overflow-x: hidden; /* Previene cualquier desbordamiento horizontal */
+}
+
+/*
+  SOLUCIÓN CLAVE 1:
+  La sidebar ahora está posicionada de forma absoluta.
+  Por defecto, está fuera de la pantalla hacia la izquierda.
+*/
+.sidebar-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--sidebar-width); /* Ancho fijo */
+    min-width: var(--sidebar-width); /* Aseguramos el ancho */
+    transform: translateX(-100%); /* <-- La movemos fuera de la vista */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* <-- Animamos su posición */
+    z-index: 1000; /* Aseguramos que esté por encima de otros elementos si es necesario */
+}
+
+/*
+  SOLUCIÓN CLAVE 2:
+  Cuando la clase 'sidebar-is-open' está presente, movemos la sidebar
+  a su posición visible (dentro de la pantalla).
+*/
+.main-layout.sidebar-is-open .sidebar-container {
+    transform: translateX(0); /* <-- La traemos de vuelta a la vista */
+}
+
+/*
+  SOLUCIÓN CLAVE 3:
+  El contenedor del contenido principal (Header + main) tendrá un margen a la izquierda
+  para dejar espacio a la sidebar. Este margen también se anima.
+*/
+.content-wrapper {
+    margin-left: 0; /* Por defecto no hay margen */
+    width: 100%;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* <-- Animamos el margen */
+}
+
+/*
+  SOLUCIÓN CLAVE 4:
+  Cuando la sidebar está abierta, empujamos el contenido principal
+  hacia la derecha para que no quede oculto debajo de la sidebar.
+*/
+.main-layout.sidebar-is-open .content-wrapper {
+    margin-left: var(--sidebar-width); /* <-- Creamos el espacio */
+}
+
+/*
+  Para mantener el contenido de la sidebar sin saltos de línea
+  y asegurar que la opacidad funcione bien.
+*/
+.sidebar-container {
+    white-space: nowrap;
+}
+
+.sidebar-container .logo-section,
+.sidebar-container .list-none {
+    opacity: 1; /* Por defecto es visible */
+    transition: opacity 0.2s ease;
+}
+
+/* Ocultamos el contenido justo antes de que la sidebar desaparezca */
+.main-layout:not(.sidebar-is-open) .sidebar-container .logo-section,
+.main-layout:not(.sidebar-is-open) .sidebar-container .list-none {
+    opacity: 0;
+    transition-delay: 0.1s; /* Un pequeño retraso para que se oculte durante la animación */
+}
+
+/* ------------------------------------------- */
+/* 5. Lógica Responsiva (NUEVO)                */
+/* ------------------------------------------- */
+
+/* Usaremos un punto de quiebre común: 768px (tablets y móviles) */
+@media (max-width: 768px) {
+
+    /*
+      Cuando la sidebar esté abierta en móvil, el contenido principal
+      ya no se moverá. La sidebar se superpondrá.
+    */
+    .main-layout.sidebar-is-open .content-wrapper {
+        margin-left: 0;
+    }
+
+    /*
+      Hacemos el botón de hamburguesa más prominente y le damos un z-index
+      alto para que siempre esté visible.
+    */
+    .header-component .p-button[aria-label="Toggle Sidebar"] {
+        z-index: 1001; /* Más alto que la sidebar */
+        color: var(--p-primary-500) !important; /* Más visible */
+    }
+
+    /*
+      En móvil, el overlay se hará visible cuando la sidebar se abra,
+      oscureciendo el contenido principal.
+    */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999; /* Justo debajo de la sidebar */
+        opacity: 0;
+        pointer-events: none; /* No se puede hacer clic por defecto */
+        transition: opacity 0.3s ease;
+    }
+
+    .main-layout.sidebar-is-open .sidebar-overlay {
+        opacity: 1;
+        pointer-events: all; /* Se puede hacer clic para cerrar */
+    }
+
+    /*
+      Ocultamos las etiquetas de texto en los botones del header
+      para ahorrar espacio, dejando solo los iconos.
+    */
+    .header-component .p-button .p-button-label {
+        display: none;
+    }
+
+    /* Ajustamos el padding del contenido principal en pantallas pequeñas */
+    .content-wrapper main {
+        padding: 1rem;
+    }
+}
