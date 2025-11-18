@@ -1,9 +1,25 @@
-import axios from 'axios';
 import apiClient from '@/services/http-common.js';
 import { TaskRepository } from '../domain/repositories/task.repository';
 import { Task } from '../domain/models/task.entity';
 
-const TASK_ENDPOINT = import.meta.env.VITE_TASK_ENDPOINT_PATH;
+// Se mantiene updateCompletion para casos futuros de toggle rápido aunque no se use aún
+
+const TASKS_ENDPOINT = '/tasks';
+
+function isoToDDMM(iso) {
+  if (!iso) return '01/01';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '01/01';
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}`;
+}
+
+function ddmmToISO(ddmm) {
+  const [day, month] = ddmm.split('/').map(Number);
+  const year = new Date().getFullYear();
+  return new Date(year, month - 1, day).toISOString();
+}
 
 /**
  * @class TaskApiRepository
@@ -21,8 +37,8 @@ export class TaskApiRepository extends TaskRepository {
         return new Task({
             id: apiData.id,
             description: apiData.description,
-            dueDate: apiData.due_date,
-            field: apiData.field,
+            dueDate: isoToDDMM(apiData.dueDate || apiData.due_date),
+            field: apiData.field?.name || apiData.field || apiData.fieldName || '—',
             completed: apiData.completed || false,
         });
     }
@@ -36,8 +52,9 @@ export class TaskApiRepository extends TaskRepository {
         return {
             id: domainData.id,
             description: domainData.description,
-            due_date: domainData.dueDate,
-            field: domainData.field,
+            dueDate: ddmmToISO(domainData.dueDate),
+            fieldId: domainData.fieldId || domainData.field_id, // si se provee
+            completed: domainData.completed || false,
         };
     }
 
@@ -46,8 +63,8 @@ export class TaskApiRepository extends TaskRepository {
      * @returns {Promise<Array<Task>>} Array of task entities.
      */
     async getAll() {
-        const response = await apiClient.get(TASK_ENDPOINT);
-        return response.data.map((item) => this.apiToDomain(item));
+        const response = await apiClient.get(TASKS_ENDPOINT);
+        return Array.isArray(response.data) ? response.data.map(d => this.apiToDomain(d)) : [];
     }
 
     /**
@@ -56,7 +73,7 @@ export class TaskApiRepository extends TaskRepository {
      * @returns {Promise<Task>} The task entity.
      */
     async getById(id) {
-        const response = await apiClient.get(`${TASK_ENDPOINT}/${id}`);
+        const response = await apiClient.get(`${TASKS_ENDPOINT}/${id}`);
         return this.apiToDomain(response.data);
     }
 
@@ -66,8 +83,8 @@ export class TaskApiRepository extends TaskRepository {
      * @returns {Promise<Task>} The created task entity.
      */
     async create(task) {
-        const apiData = this.domainToApi(task);
-        const response = await apiClient.post(TASK_ENDPOINT, apiData);
+        const payload = this.domainToApi(task);
+        const response = await apiClient.post(TASKS_ENDPOINT, payload);
         return this.apiToDomain(response.data);
     }
 
@@ -77,15 +94,13 @@ export class TaskApiRepository extends TaskRepository {
      * @returns {Promise<Task>} The updated task entity.
      */
     async update(task) {
-        const apiData = this.domainToApi(task);
-        const response = await apiClient.patch(`${TASK_ENDPOINT}/${task.id}`, apiData);
+        const payload = this.domainToApi(task);
+        const response = await apiClient.put(`${TASKS_ENDPOINT}/${task.id}`, payload);
         return this.apiToDomain(response.data);
     }
 
     async updateCompletion(task) {
-        const response = await apiClient.patch(`${TASK_ENDPOINT}/${task.id}`, {
-            completed: task.completed,
-        });
+        const response = await apiClient.put(`${TASKS_ENDPOINT}/${task.id}`, { completed: task.completed });
         return this.apiToDomain(response.data);
     }
 
@@ -95,6 +110,6 @@ export class TaskApiRepository extends TaskRepository {
      * @returns {Promise<void>}
      */
     async delete(id) {
-        await apiClient.delete(`${TASK_ENDPOINT}/${id}`);
+        await apiClient.delete(`${TASKS_ENDPOINT}/${id}`);
     }
 }

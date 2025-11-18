@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', {
      * Getters
      */
     getters: {
-        isAuthenticated: (state) => !!state.user,
+        isAuthenticated: (state) => !!state.user, // permitir cookie-based sessions
     },
 
     /**
@@ -37,16 +37,9 @@ export const useAuthStore = defineStore('auth', {
                 // 1. Llamamos a la API a través del repositorio
                 const user = await authRepository.login(email, password);
 
-                // 2. Generamos un token simulado (ya que json-server no da uno real)
-                const fakeToken = 'jwt-' + Date.now();
-
-                // 3. Guardamos en el estado
-                this.user = user;
-                this.token = fakeToken;
-
-                // 4. Persistimos en localStorage
-                localStorage.setItem('token', fakeToken);
-                localStorage.setItem('user', JSON.stringify(user));
+                // 2. El repositorio ya guardó token y user en localStorage
+                this.user = JSON.parse(localStorage.getItem('user'));
+                this.token = localStorage.getItem('token');
 
                 return true;
             } catch (err) {

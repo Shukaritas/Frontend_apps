@@ -9,7 +9,7 @@ import { Crop } from '../domain/models/crop.model';
  * @author Jefferson Castro
  */
 export class CropApiRepository extends CropRepository {
-    endpoint = '/crop_fields';
+    endpoint = '/cropfields';
 
     /**
      * Maps API data to the Crop domain model.
@@ -19,12 +19,12 @@ export class CropApiRepository extends CropRepository {
     apiToDomain(apiData) {
         return new Crop({
             id: apiData.id,
-            title: apiData.title,
+            title: apiData.crop_type || apiData.title,
             planting_date: apiData.planting_date,
             harvest_date: apiData.harvest_date,
-            field: apiData.field,
+            field: apiData.field_id || apiData.field,
             status: apiData.status,
-            days: apiData.days
+            days: apiData.days || apiData.days_since_planting || '0'
         });
     }
 
@@ -36,10 +36,10 @@ export class CropApiRepository extends CropRepository {
     domainToApi(domainData) {
         return {
             id: domainData.id,
-            title: domainData.title,
+            crop_type: domainData.title,
             planting_date: domainData.planting_date,
             harvest_date: domainData.harvest_date,
-            field: domainData.field,
+            field_id: domainData.field,
             status: domainData.status,
             days: domainData.days
         };
@@ -51,7 +51,7 @@ export class CropApiRepository extends CropRepository {
      */
     async getAll() {
         const response = await http.get(this.endpoint);
-        return response.data.map(cropData => this.apiToDomain(cropData));
+        return Array.isArray(response.data) ? response.data.map(d => this.apiToDomain(d)) : [];
     }
 
     /**
@@ -70,8 +70,8 @@ export class CropApiRepository extends CropRepository {
      * @returns {Promise<Crop>} The created entity returned by the API.
      */
     async create(crop) {
-        const apiData = this.domainToApi(crop);
-        const response = await http.post(this.endpoint, apiData);
+        const payload = this.domainToApi(crop);
+        const response = await http.post(this.endpoint, payload);
         return this.apiToDomain(response.data);
     }
 
@@ -81,8 +81,8 @@ export class CropApiRepository extends CropRepository {
      * @returns {Promise<Crop>} The updated entity returned by the API.
      */
     async update(crop) {
-        const apiData = this.domainToApi(crop);
-        const response = await http.put(`${this.endpoint}/${crop.id}`, apiData);
+        const payload = this.domainToApi(crop);
+        const response = await http.put(`${this.endpoint}/${crop.id}`, payload);
         return this.apiToDomain(response.data);
     }
 

@@ -2,33 +2,66 @@ import http from '@/services/http-common.js';
 import { DashboardRepository } from '../domain/repositories/dashboard.repository';
 import { DashboardData } from '../domain/models/dashboard.model';
 
+// Recomendaciones estáticas (se evita consumo API real para Community)
+const STATIC_RECOMMENDATIONS = [
+  { id: 1, user: 'AgroExpert', role: 'Especialista', description: 'Optimiza riego temprano para mejorar retención de nutrientes.' },
+  { id: 2, user: 'SoilGuru', role: 'Analista Suelos', description: 'Añade compost orgánico en parcelas con menor humedad.' },
+  { id: 3, user: 'CropTech', role: 'Tecnólogo', description: 'Considera sensores de humedad en campos con variabilidad extrema.' }
+];
+
+function isoToDateObj(iso) {
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? null : d;
+}
+
 /**
  * @class DashboardApiRepository
  * @classdesc Implementación del repositorio que interactúa con la API REST para obtener los datos del dashboard.
  * @extends DashboardRepository
  */
 export class DashboardApiRepository extends DashboardRepository {
-    /**
-     * Obtiene todos los datos necesarios para el dashboard desde la API.
-     * @returns {Promise<DashboardData>} La entidad de datos del dashboard.
-     */
-    async getDashboardData() {
+  async getDashboardData() {
+    try {
+      const userRaw = localStorage.getItem('user');
+      if (!userRaw) throw new Error('Usuario no autenticado');
+      const { id: userId } = JSON.parse(userRaw);
 
-        const previewFieldsPath = import.meta.env.VITE_PREVIEW_FIELDS_ENDPOINT_PATH;
-        const recommendationsPath = import.meta.env.VITE_RECOMMENDATIONS_ENDPOINT_PATH;
-        const upcomingTasksPath = import.meta.env.VITE_UPCOMING_TASKS_ENDPOINT_PATH;
+      let fields = [];
+      try {
+        const resp = await http.get(`/fields/user/${userId}`);
+        fields = Array.isArray(resp.data) ? resp.data : [];
+      } catch {
+        const resAll = await http.get('/fields');
+        const all = Array.isArray(resAll.data) ? resAll.data : [];
+        fields = all.filter(f => (f.userId ?? f.user_id) == userId);
+      }
 
+      const previewFields = fields.slice(0, 4).map(f => ({
+        id: f.id,
+        name: f.name,
+        imageUrl: f.imageUrl || f.image_url || '',
+        location: f.location,
+      }));
 
-        const [previewFieldsResponse, recommendationsResponse, upcomingTasksResponse] = await Promise.all([
-            http.get(previewFieldsPath),
-            http.get(recommendationsPath),
-            http.get(upcomingTasksPath)
-        ]);
+      const allTasks = fields.flatMap(f => Array.isArray(f.tasks) ? f.tasks.map(t => ({ ...t, fieldId: f.id, fieldName: f.name })) : []);
+      const upcomingTasks = allTasks
+        .map(t => {
+          const dueIso = t.dueDate || t.due_date;
+          const d = new Date(dueIso);
+          return { id: t.id, description: t.description, dueDate: d, fieldId: t.fieldId, fieldName: t.fieldName, completed: t.completed || false };
+        })
+        .filter(t => t.dueDate instanceof Date && !isNaN(t.dueDate.getTime()) && t.dueDate >= new Date())
+        .sort((a,b) => a.dueDate - b.dueDate)
+        .slice(0, 8)
+        .map(t => ({ id: t.id, description: t.description, dueDate: t.dueDate.toISOString(), field: t.fieldName, completed: t.completed }));
 
-        return new DashboardData({
-            previewFields: previewFieldsResponse.data,
-            recommendations: recommendationsResponse.data,
-            upcomingTasks: upcomingTasksResponse.data
-        });
+      return new DashboardData({
+        previewFields,
+        recommendations: STATIC_RECOMMENDATIONS,
+        upcomingTasks
+      });
+    } catch (error) {
+      throw new Error(error.message || 'Error al obtener datos de dashboard');
     }
+  }
 }
