@@ -111,10 +111,38 @@ const previewFieldsWithStatus = ref([]);
 
 onMounted(async () => {
   try {
-    const [{ data: previews }, { data: statuses }, { data: fields }] = await Promise.all([
+    // Obtener userId sin depender del store
+    const userId = (() => {
+      try { return JSON.parse(localStorage.getItem('user') || '{}').id; } catch { return null; }
+    })();
+
+    const getUserFields = async () => {
+      if (!userId) return [];
+      // 1) /fields/user/:userId
+      try {
+        const { data } = await http.get(`/fields/user/${userId}`);
+        return Array.isArray(data) ? data : [];
+      } catch (_) {
+        // 2) /users/:userId/fields
+        try {
+          const { data } = await http.get(`/users/${userId}/fields`);
+          return Array.isArray(data) ? data : [];
+        } catch (_) {
+          // 3) /fields?userId=:userId
+          try {
+            const { data } = await http.get('/fields', { params: { userId } });
+            return Array.isArray(data) ? data : [];
+          } catch (_) {
+            return [];
+          }
+        }
+      }
+    };
+
+    const [{ data: previews }, { data: statuses }, fields] = await Promise.all([
       http.get('/preview_fields'),
       http.get('/crop_status'),
-      http.get('/fields')
+      getUserFields()
     ]);
 
     const statusById = Object.fromEntries(statuses.map(s => [s.id, s.status]));

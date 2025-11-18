@@ -32,6 +32,18 @@ function decodeJwtClaims(token) {
   } catch { return {}; }
 }
 
+function extractIdFromClaims(claims) {
+  const candidate = claims?.id ?? claims?.userId ?? claims?.nameid ?? claims?.sub ?? claims?.uid;
+  return candidate;
+}
+
+function isValidId(id) {
+  if (id === undefined || id === null) return false;
+  if (typeof id === 'number') return Number.isFinite(id);
+  if (typeof id === 'string') return id.trim().length > 0; // acepta UUID o string no vacío
+  return false;
+}
+
 export class AuthApiRepository {
   /**
    * Realiza login contra API .NET 9.
@@ -49,8 +61,8 @@ export class AuthApiRepository {
       if (typeof data === 'string') {
         const token = data;
         const claims = decodeJwtClaims(token);
-        const idFromJwt = Number(claims.id ?? claims.userId ?? claims.nameid ?? claims.sub ?? claims.uid);
-        if (!Number.isFinite(idFromJwt)) throw new Error('La respuesta de login no incluye un ID de usuario válido.');
+        const idFromJwt = extractIdFromClaims(claims);
+        if (!isValidId(idFromJwt)) throw new Error('La respuesta de login no incluye un ID de usuario válido.');
         const user = new User({ id: idFromJwt, username: claims.unique_name || '', email, password: '******', phoneNumber: '+000000000', identificator: '00000000' });
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify({ id: user.id, username: user.username, email: user.email }));
@@ -84,13 +96,14 @@ export class AuthApiRepository {
       let id = getCI(userBody, 'id') ?? getCI(userBody, 'userId') ?? getCI(userBody, 'user_id');
 
       // Si hay token y no hay id en body, intentamos extraerlo del JWT
-      if (!id && token) {
+      if (!isValidId(id) && token) {
         const claims = decodeJwtClaims(token);
-        const idFromJwt = Number(claims.id ?? claims.userId ?? claims.nameid ?? claims.sub ?? claims.uid);
-        if (Number.isFinite(idFromJwt)) id = idFromJwt;
+        const idFromJwt = extractIdFromClaims(claims);
+        if (isValidId(idFromJwt)) id = idFromJwt;
       }
 
-      if (!token || !Number.isFinite(Number(id))) {
+      // Aceptar sesión con token o con cookie; sólo requerimos ID válido
+      if (!isValidId(id)) {
         const backendMessage = getCI(body, 'message') || getCI(body, 'error') || getCI(body, 'detail') || getCI(body, 'title');
         throw new Error(backendMessage || 'La respuesta de login no incluye un ID de usuario válido.');
       }
@@ -102,7 +115,7 @@ export class AuthApiRepository {
       const phoneNumber = typeof phoneNumberRaw === 'string' && /^\+\d+/.test(phoneNumberRaw) ? phoneNumberRaw : '+000000000';
       const identificator = typeof identificatorRaw === 'string' && /^\d{8}$/.test(identificatorRaw) ? identificatorRaw : '00000000';
 
-      const user = new User({ id: Number(id), username, email: emailResp, password: '******', phoneNumber, identificator });
+      const user = new User({ id, username, email: emailResp, password: '******', phoneNumber, identificator });
 
       // Si hay token, lo guardamos; si no, asumimos sesión vía cookie (withCredentials)
       if (token) localStorage.setItem('token', token); else localStorage.removeItem('token');

@@ -27,13 +27,31 @@ export class DashboardApiRepository extends DashboardRepository {
       const { id: userId } = JSON.parse(userRaw);
 
       let fields = [];
+      // Intento 1: endpoint específico por usuario
       try {
         const resp = await http.get(`/fields/user/${userId}`);
         fields = Array.isArray(resp.data) ? resp.data : [];
-      } catch {
-        const resAll = await http.get('/fields');
-        const all = Array.isArray(resAll.data) ? resAll.data : [];
-        fields = all.filter(f => (f.userId ?? f.user_id) == userId);
+      } catch (e1) {
+        // Intento 2: /users/:userId/fields
+        try {
+          const resp2 = await http.get(`/users/${userId}/fields`);
+          fields = Array.isArray(resp2.data) ? resp2.data : [];
+        } catch (e2) {
+          // Intento 3: /fields?userId=:userId
+          try {
+            const resp3 = await http.get('/fields', { params: { userId } });
+            fields = Array.isArray(resp3.data) ? resp3.data : [];
+          } catch (e3) {
+            // Intento 4: /fields y filtramos
+            try {
+              const resAll = await http.get('/fields');
+              const all = Array.isArray(resAll.data) ? resAll.data : [];
+              fields = all.filter(f => (f.userId ?? f.user_id) == userId);
+            } catch (e4) {
+              fields = [];
+            }
+          }
+        }
       }
 
       const previewFields = fields.slice(0, 4).map(f => ({
