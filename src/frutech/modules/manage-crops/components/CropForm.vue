@@ -45,7 +45,7 @@
         <small v-if="errors.harvest_date" class="p-error">{{ errors.harvest_date }}</small>
       </div>
 
-      <div class="field">
+      <div class="field" v-if="!isEditing">
         <label for="field" class="block text-900 font-medium mb-2">{{ $t('manageCrops.field') }} *</label>
         <InputText 
           id="field"
@@ -63,6 +63,8 @@
           id="status"
           v-model="formData.status" 
           :options="statusOptions"
+          optionLabel="label"
+          optionValue="value"
           :placeholder="$t('manageCrops.selectStatus')"
           :class="{'p-invalid': errors.status}"
           class="w-full"
@@ -70,7 +72,7 @@
         <small v-if="errors.status" class="p-error">{{ errors.status }}</small>
       </div>
 
-      <div class="field">
+      <div class="field" v-if="!isEditing">
         <label for="days" class="block text-900 font-medium mb-2">{{ $t('manageCrops.days') }} *</label>
         <InputText 
           id="days"
@@ -222,16 +224,19 @@ const validateForm = () => {
     errors.value.harvest_date = $t('manageCrops.validation.harvestDateRequired');
   }
 
-  if (!formData.value.field.trim()) {
-    errors.value.field = $t('manageCrops.validation.fieldRequired');
+  // Only validate field and days when creating a new crop
+  if (!isEditing.value) {
+    if (!formData.value.field.trim()) {
+      errors.value.field = $t('manageCrops.validation.fieldRequired');
+    }
+
+    if (!formData.value.days.trim()) {
+      errors.value.days = $t('manageCrops.validation.daysRequired');
+    }
   }
 
   if (!formData.value.status) {
     errors.value.status = $t('manageCrops.validation.statusRequired');
-  }
-
-  if (!formData.value.days.trim()) {
-    errors.value.days = $t('manageCrops.validation.daysRequired');
   }
 
   return Object.keys(errors.value).length === 0;

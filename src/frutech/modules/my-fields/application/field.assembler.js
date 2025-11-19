@@ -1,3 +1,82 @@
+/**
+ * Convierte una fecha ISO (YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss) a formato display DD/MM/YYYY
+ * @param {string} isoDate - Fecha en formato ISO
+ * @returns {string} Fecha en formato DD/MM/YYYY o string vacío si es inválida
+ */
+function isoToDisplayDate(isoDate) {
+  if (!isoDate || typeof isoDate !== 'string' || isoDate.trim() === '') {
+    return '';
+  }
+
+  try {
+    // Remover parte de hora si existe
+    const datePart = isoDate.split('T')[0];
+
+    // Si ya está en formato DD/MM/YYYY, retornar tal cual
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(datePart)) {
+      return datePart;
+    }
+
+    // Parsear formato ISO YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}/.test(datePart)) {
+      const [year, month, day] = datePart.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    // Intentar parsear como Date
+    const date = new Date(isoDate);
+    if (!isNaN(date.getTime())) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+  } catch (e) {
+    console.warn('Error converting date to display format:', isoDate, e);
+  }
+
+  return '';
+}
+
+/**
+ * Convierte una fecha ISO (YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss) a formato corto DD/MM
+ * @param {string} isoDate - Fecha en formato ISO
+ * @returns {string} Fecha en formato DD/MM o string vacío si es inválida
+ */
+function isoToShortDate(isoDate) {
+  if (!isoDate || typeof isoDate !== 'string' || isoDate.trim() === '') {
+    return '';
+  }
+
+  try {
+    // Remover parte de hora si existe
+    const datePart = isoDate.split('T')[0];
+
+    // Si ya está en formato DD/MM, retornar tal cual
+    if (/^\d{2}\/\d{2}$/.test(datePart)) {
+      return datePart;
+    }
+
+    // Parsear formato ISO YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}/.test(datePart)) {
+      const [year, month, day] = datePart.split('-');
+      return `${day}/${month}`;
+    }
+
+    // Intentar parsear como Date
+    const date = new Date(isoDate);
+    if (!isNaN(date.getTime())) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      return `${day}/${month}`;
+    }
+  } catch (e) {
+    console.warn('Error converting date to short format:', isoDate, e);
+  }
+
+  return '';
+}
+
 export class FieldAssembler {
   /**
    * Convierte un recurso de la API (FieldResource) al modelo de dominio.
@@ -5,6 +84,7 @@ export class FieldAssembler {
    * NOTA IMPORTANTE: El backend ahora envía propiedades en snake_case y con datos del cultivo aplanados.
    * - imageUrl viene en formato Base64 (data:image/...;base64,...)
    * - Propiedades de cultivo están en el mismo nivel que el field
+   * - progressHistory puede ser un objeto (nuevo formato) o un array (legacy)
    */
   static toModel(resource) {
     if (!resource) return null;
@@ -54,22 +134,75 @@ export class FieldAssembler {
       daysSincePlanting: resource.daysSincePlanting ?? resource.days_since_planting ?? 0,
       days_since_planting: resource.daysSincePlanting ?? resource.days_since_planting ?? 0, // Legacy
 
-      // Progress history (opcional)
-      progress_history: Array.isArray(resource.progressHistory)
-        ? resource.progressHistory
-        : (Array.isArray(resource.progress_history) ? resource.progress_history : []),
+      // Progress history - El backend ahora envía un objeto con fechas, la vista espera un array
+      progress_history: (() => {
+        // Intentar obtener progressHistory desde múltiples formatos
+        const progressData = resource.progressHistory ?? resource.progress_history;
+
+        // Si es un array (formato legacy), procesarlo como antes
+        if (Array.isArray(progressData)) {
+          return progressData.map(p => ({
+            id: p.id ?? p.Id,
+            date: p.date ?? p.Date ?? new Date().toISOString(),
+            watered: isoToDisplayDate(p.watered ?? p.Watered) || '',
+            fertilized: isoToDisplayDate(p.fertilized ?? p.Fertilized) || '',
+            pests: isoToDisplayDate(p.pests ?? p.Pests) || ''
+          }));
+        }
+
+        // Si es un objeto (nuevo formato del backend), convertirlo a array con un elemento
+        if (progressData && typeof progressData === 'object' && !Array.isArray(progressData)) {
+          return [{
+            id: progressData.id ?? progressData.Id,
+            date: progressData.date ?? progressData.Date ?? new Date().toISOString(),
+            watered: isoToDisplayDate(progressData.watered ?? progressData.Watered) || '',
+            fertilized: isoToDisplayDate(progressData.fertilized ?? progressData.Fertilized) || '',
+            pests: isoToDisplayDate(progressData.pests ?? progressData.Pests) || ''
+          }];
+        }
+
+        // Si no hay datos, retornar array vacío
+        return [];
+      })(),
+
+      // ID del registro de progreso más reciente (para actualizaciones)
+      // Prioridad: propiedad directa -> objeto progressHistory -> último elemento del array
+      progressHistoryId: (() => {
+        // 1. Intentar desde propiedad directa
+        if (resource.progressHistoryId ?? resource.progress_history_id ?? resource.ProgressHistoryId) {
+          return resource.progressHistoryId ?? resource.progress_history_id ?? resource.ProgressHistoryId;
+        }
+
+        const progressData = resource.progressHistory ?? resource.progress_history;
+
+        // 2. Si es un objeto (nuevo formato), obtener su ID
+        if (progressData && typeof progressData === 'object' && !Array.isArray(progressData)) {
+          return progressData.id ?? progressData.Id ?? null;
+        }
+
+        // 3. Si es un array, obtener el ID del último elemento
+        if (Array.isArray(progressData) && progressData.length > 0) {
+          const lastItem = progressData[progressData.length - 1];
+          return lastItem?.id ?? lastItem?.Id ?? null;
+        }
+
+        return null;
+      })(),
 
       // Tareas asociadas
       tasks: Array.isArray(resource.tasks)
-        ? resource.tasks.map(t => ({
-            id: t.id ?? t.Id,
-            description: t.description ?? t.Description,
-            dueDate: t.dueDate || t.due_date || t.DueDate,
-            date: t.dueDate || t.due_date || t.DueDate || t.date, // Legacy para compatibilidad
-            completed: t.completed || t.Completed || false,
-            name: t.name ?? t.fieldName ?? t.field_name ?? '',
-            task: t.description ?? t.Description ?? t.task ?? ''
-          }))
+        ? resource.tasks.map(t => {
+            const rawDueDate = t.dueDate || t.due_date || t.DueDate || t.date;
+            return {
+              id: t.id ?? t.Id,
+              description: t.description ?? t.Description,
+              dueDate: rawDueDate, // Mantener formato ISO para lógica interna
+              date: isoToShortDate(rawDueDate), // Formato legible DD/MM para la UI
+              completed: t.completed || t.Completed || false,
+              name: t.name ?? t.fieldName ?? t.field_name ?? '',
+              task: t.description ?? t.Description ?? t.task ?? ''
+            };
+          })
         : []
     };
   }

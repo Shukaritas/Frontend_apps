@@ -32,11 +32,20 @@ export class TaskApiRepository extends TaskRepository {
    * @returns {Task} An instance of the Task entity.
    */
   apiToDomain(apiData) {
+    // Obtener el valor del campo con orden de prioridad
+    let fieldValue = apiData.fieldName ?? apiData.FieldName ?? apiData.field_name ??
+                     apiData.field?.name ?? apiData.field;
+
+    // Si el valor es falsy o una cadena vacía después de trim, usar valor por defecto
+    if (!fieldValue || (typeof fieldValue === 'string' && fieldValue.trim() === '')) {
+      fieldValue = 'Campo Desconocido';
+    }
+
     return new Task({
       id: apiData.id ?? apiData.Id,
       description: apiData.description ?? apiData.Description,
       dueDate: isoToDDMM(apiData.dueDate ?? apiData.DueDate ?? apiData.due_date),
-      field: apiData.field?.name || apiData.field || apiData.fieldName || apiData.FieldName || '—',
+      field: fieldValue,
       completed: Boolean(apiData.completed ?? apiData.Completed ?? false),
     });
   }

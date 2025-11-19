@@ -33,7 +33,7 @@
         </small>
       </div>
 
-      <div class="field">
+      <div class="field" v-if="!isEditMode">
         <label for="field">Field</label>
         <Dropdown 
           id="field"
@@ -119,7 +119,11 @@ watch(() => props.task, (newTask) => {
 const handleSubmit = () => {
   submitted.value = true;
   
-  if (!formData.value.description || !formData.value.dueDate || !formData.value.field) {
+  // En modo edición, no se requiere el campo "field" ya que no es editable
+  const isValid = formData.value.description && formData.value.dueDate &&
+                  (isEditMode.value || formData.value.field);
+
+  if (!isValid) {
     return;
   }
 

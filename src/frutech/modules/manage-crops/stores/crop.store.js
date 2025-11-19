@@ -97,13 +97,11 @@ export const useCropStore = defineStore('crop', () => {
                 cropData.watering
             );
             
-            const updatedEntity = await repository.update(currentEntity);
-            const updatedCropDTO = assembler.toDTO(updatedEntity);
-            
-            const index = crops.value.findIndex(crop => crop.id === cropId);
-            if (index !== -1) {
-                crops.value[index] = updatedCropDTO;
-            }
+            await repository.update(currentEntity);
+
+            // Recargar la lista completa desde el servidor para garantizar
+            // que todos los datos calculados y relaciones estén actualizados
+            await fetchCrops();
         } catch (err) {
             error.value = 'Could not update crop.';
             console.error(err);
@@ -144,13 +142,11 @@ export const useCropStore = defineStore('crop', () => {
             const currentEntity = await repository.getById(cropId);
             currentEntity.updateStatus(newStatus);
             
-            const updatedEntity = await repository.update(currentEntity);
-            const updatedCropDTO = assembler.toDTO(updatedEntity);
-            
-            const index = crops.value.findIndex(crop => crop.id === cropId);
-            if (index !== -1) {
-                crops.value[index] = updatedCropDTO;
-            }
+            await repository.update(currentEntity);
+
+            // Recargar la lista completa desde el servidor para garantizar
+            // que todos los datos calculados y relaciones estén actualizados
+            await fetchCrops();
         } catch (err) {
             error.value = 'Could not update crop status.';
             console.error(err);
