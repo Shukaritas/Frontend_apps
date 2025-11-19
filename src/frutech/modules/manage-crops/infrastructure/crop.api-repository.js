@@ -6,40 +6,36 @@ import { Crop } from '../domain/models/crop.model';
  * @class CropApiRepository
  * @classdesc Repository implementation that interacts with a REST API to manage crops.
  * @extends CropRepository
- * @author Jefferson Castro
  */
 export class CropApiRepository extends CropRepository {
-    endpoint = '/cropfields';
+    endpoint = '/v1/CropFields';
 
     /**
      * Maps API data to the Crop domain model.
-     * @param {object} apiData - The raw data from the API.
-     * @returns {Crop} An instance of the Crop entity.
+     * Backend likely returns PascalCase or camelCase. We normalize to domain shape.
      */
     apiToDomain(apiData) {
         return new Crop({
-            id: apiData.id,
-            title: apiData.crop_type || apiData.title,
-            planting_date: apiData.planting_date,
-            harvest_date: apiData.harvest_date,
-            field: apiData.field_id || apiData.field,
-            status: apiData.status,
-            days: apiData.days || apiData.days_since_planting || '0'
+            id: apiData.id ?? apiData.Id,
+            title: apiData.cropType ?? apiData.CropType ?? apiData.title,
+            planting_date: apiData.plantingDate ?? apiData.PlantingDate ?? apiData.planting_date,
+            harvest_date: apiData.harvestDate ?? apiData.HarvestDate ?? apiData.harvest_date,
+            field: apiData.fieldId ?? apiData.FieldId ?? apiData.field_id ?? apiData.field,
+            status: apiData.status ?? apiData.Status,
+            days: apiData.days ?? apiData.Days ?? apiData.days_since_planting ?? '0'
         });
     }
 
     /**
-     * Maps a Crop domain entity to a plain object for API submission.
-     * @param {Crop} domainData - The domain entity.
-     * @returns {object} A plain object compatible with the API.
+     * Maps a Crop domain entity to API payload.
      */
     domainToApi(domainData) {
         return {
             id: domainData.id,
-            crop_type: domainData.title,
-            planting_date: domainData.planting_date,
-            harvest_date: domainData.harvest_date,
-            field_id: domainData.field,
+            cropType: domainData.title,
+            plantingDate: domainData.planting_date,
+            harvestDate: domainData.harvest_date,
+            fieldId: domainData.field,
             status: domainData.status,
             days: domainData.days
         };

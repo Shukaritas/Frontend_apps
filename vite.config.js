@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
           target,
           changeOrigin: true,
           secure: false,
-          // No reescribimos el prefijo /api para conservar /api/v1 en el backend
+          // Mantenemos el prefijo /api tal cual para soportar /api/Tasks y /api/v1/... del backend
           // rewrite: (path) => path
         },
       },

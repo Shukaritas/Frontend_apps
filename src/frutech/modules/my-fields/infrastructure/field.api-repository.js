@@ -23,42 +23,27 @@ export class FieldApiRepository extends IFieldRepository {
       throw new Error('ID de usuario inválido');
     }
 
-    // Intento 1: /fields/user/:userId
+    // Usar endpoint oficial /api/v1/Fields/user/{userId}
     try {
-      const response = await http.get(`/fields/user/${userId}`);
+      const response = await http.get(`/v1/Fields/user/${userId}`);
       const data = Array.isArray(response.data) ? response.data : [];
       return FieldAssembler.toModels(data);
     } catch (e1) {
-      // Intento 2: /users/:userId/fields
+      // Respaldo: /api/v1/Fields
       try {
-        const response = await http.get(`/users/${userId}/fields`);
-        const data = Array.isArray(response.data) ? response.data : [];
-        return FieldAssembler.toModels(data);
+        const resAll = await http.get('/v1/Fields');
+        const all = Array.isArray(resAll.data) ? resAll.data : [];
+        const mine = all.filter(f => String(f.userId ?? f.user_id) === String(userId));
+        return FieldAssembler.toModels(mine);
       } catch (e2) {
-        // Intento 3: /fields?userId=:userId
-        try {
-          const response = await http.get(`/fields`, { params: { userId } });
-          const data = Array.isArray(response.data) ? response.data : [];
-          return FieldAssembler.toModels(data);
-        } catch (e3) {
-          // Intento 4 (último): /fields plano y filtramos
-          try {
-            const resAll = await http.get('/fields');
-            const all = Array.isArray(resAll.data) ? resAll.data : [];
-            const mine = all.filter(f => (f.userId ?? f.user_id) == userId);
-            return FieldAssembler.toModels(mine);
-          } catch (e4) {
-            // Si también falla, devolvemos vacío para no romper la UI
-            return [];
-          }
-        }
+        return [];
       }
     }
   }
 
   async getById(id) {
     try {
-      const response = await http.get(`/fields/${id}`);
+      const response = await http.get(`/v1/Fields/${id}`);
       return FieldAssembler.toModel(response.data);
     } catch (error) {
       throw new Error(error.message || 'Error obteniendo campo');
@@ -68,8 +53,32 @@ export class FieldApiRepository extends IFieldRepository {
   async create(fieldData) {
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const payload = FieldAssembler.toPayload({ ...fieldData, userId: fieldData.userId || user.id });
-      const response = await http.post('/fields', payload);
+      const userId = fieldData.userId || user.id;
+
+      // Crear FormData con nombres PascalCase que espera el backend .NET
+      const formData = new FormData();
+      formData.append('Name', fieldData.name);
+      formData.append('Location', fieldData.location);
+
+      // El backend espera 'FieldSize' (PascalCase)
+      const size = fieldData.size ?? fieldData.fieldSize ?? fieldData.field_size;
+      if (size !== undefined && size !== null) {
+        formData.append('FieldSize', String(size));
+      }
+
+      // UserId en PascalCase
+      if (userId !== undefined && userId !== null) {
+        formData.append('UserId', String(userId));
+      }
+
+      // CRUCIAL: El backend espera 'Image' (PascalCase) como IFormFile
+      if (fieldData.imageFile instanceof File || fieldData.imageFile instanceof Blob) {
+        formData.append('Image', fieldData.imageFile);
+      }
+
+      const response = await http.post('/v1/Fields', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       return FieldAssembler.toModel(response.data);
     } catch (error) {
       const message = error?.message || error?.response?.data?.message || 'Error creando campo';
@@ -80,7 +89,7 @@ export class FieldApiRepository extends IFieldRepository {
   async updateField(id, fieldData) {
     try {
       const payload = FieldAssembler.toPayload(fieldData);
-      const response = await http.put(`/fields/${id}`, payload);
+      const response = await http.put(`/v1/Fields/${id}`, payload);
       return FieldAssembler.toModel(response.data);
     } catch (error) {
       throw new Error(error.message || 'Error actualizando campo');

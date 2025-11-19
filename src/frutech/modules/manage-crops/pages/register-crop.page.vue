@@ -78,7 +78,6 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { useCropStore } from '../stores/crop.store';
 import { useFieldStore } from '@/frutech/modules/my-fields/stores/field.store.js';
-import http from '@/services/http-common.js';
 
 const router = useRouter();
 const { t: $t } = useI18n();
@@ -111,52 +110,17 @@ const previewFieldsWithStatus = ref([]);
 
 onMounted(async () => {
   try {
-    // Obtener userId sin depender del store
-    const userId = (() => {
-      try { return JSON.parse(localStorage.getItem('user') || '{}').id; } catch { return null; }
-    })();
-
-    const getUserFields = async () => {
-      if (!userId) return [];
-      // 1) /fields/user/:userId
-      try {
-        const { data } = await http.get(`/fields/user/${userId}`);
-        return Array.isArray(data) ? data : [];
-      } catch (_) {
-        // 2) /users/:userId/fields
-        try {
-          const { data } = await http.get(`/users/${userId}/fields`);
-          return Array.isArray(data) ? data : [];
-        } catch (_) {
-          // 3) /fields?userId=:userId
-          try {
-            const { data } = await http.get('/fields', { params: { userId } });
-            return Array.isArray(data) ? data : [];
-          } catch (_) {
-            return [];
-          }
-        }
-      }
-    };
-
-    const [{ data: previews }, { data: statuses }, fields] = await Promise.all([
-      http.get('/preview_fields'),
-      http.get('/crop_status'),
-      getUserFields()
-    ]);
-
-    const statusById = Object.fromEntries(statuses.map(s => [s.id, s.status]));
-    const fieldById = Object.fromEntries(fields.map(f => [f.id, f]));
-
-    previewFieldsWithStatus.value = previews.map(p => {
-      const field = fieldById[p.id];
-      return {
-        ...p,
-        status: statusById[p.id] || 'Healthy',
-        crop: field?.crop || 'Desconocido',
-        days: field?.days_since_planting || '0'
-      };
-    });
+    // Cargamos los fields del usuario usando el store/repositorio real (/api/v1/Fields/user/:id)
+    await fieldStore.fetchFields();
+    // Mapear a la vista esperada (con status/crop/days); si el backend no provee, usar valores por defecto
+    previewFieldsWithStatus.value = (fieldStore.fields || []).map(f => ({
+      id: f.id,
+      title: f.name,
+      image_url: f.imageUrl,
+      status: f.status || 'Healthy',
+      crop: f.cropName || '—',
+      days: '0'
+    }));
   } catch (err) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los campos.', life: 3000 });
   }

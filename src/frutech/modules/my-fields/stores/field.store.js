@@ -49,8 +49,8 @@ export const useFieldStore = defineStore('fields', () => {
         userId,
         name: fieldData.name,
         location: fieldData.location,
-        fieldSize: fieldData.fieldSize || fieldData.size,
-        imageUrl: fieldData.imageUrl,
+        size: fieldData.size || fieldData.fieldSize,
+        imageFile: fieldData.imageFile,
       };
 
       await fieldRepository.create(payload);

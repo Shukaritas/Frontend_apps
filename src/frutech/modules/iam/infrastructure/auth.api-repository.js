@@ -33,8 +33,7 @@ function decodeJwtClaims(token) {
 }
 
 function extractIdFromClaims(claims) {
-  const candidate = claims?.id ?? claims?.userId ?? claims?.nameid ?? claims?.sub ?? claims?.uid;
-  return candidate;
+  return claims?.id ?? claims?.userId ?? claims?.nameid ?? claims?.sub ?? claims?.uid;
 }
 
 function isValidId(id) {
@@ -47,14 +46,11 @@ function isValidId(id) {
 export class AuthApiRepository {
   /**
    * Realiza login contra API .NET 9.
-   * Endpoint: POST /users/sign-in
-   * Payload: { email, password }
-   * Respuesta esperada: { id, userName, email, token }
-   * Notas: tolera variantes de nombre de token y campos.
+   * Endpoint: POST /api/v1/users/sign-in via baseURL /api
    */
   async login(email, password) {
     try {
-      const resp = await http.post('/users/sign-in', { email, password });
+      const resp = await http.post('/v1/users/sign-in', { email, password });
       let data = resp?.data;
 
       // 1) Si data es string, asúmelo como token
@@ -128,14 +124,13 @@ export class AuthApiRepository {
 
   /**
    * Registro de usuario.
-   * Endpoint: POST /users/sign-up
-   * Payload: { userName, email, phoneNumber, identificator, password }
+   * Endpoint: POST /api/v1/users/sign-up via baseURL /api
    */
   async register({ username, email, phoneNumber, identificator, password }) {
     try {
       if (!email || !password) throw new Error('Email y password son requeridos');
       const payload = { userName: username, email, phoneNumber, identificator, password };
-      const response = await http.post('/users/sign-up', payload);
+      const response = await http.post('/v1/users/sign-up', payload);
       return response.data;
     } catch (error) {
       throw new Error(error.message || 'Error en el registro');

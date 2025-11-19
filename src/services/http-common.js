@@ -5,7 +5,8 @@
 
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL || '/api/v1';
+// Usamos /api para aprovechar el proxy de Vite hacia VITE_BACKEND_ORIGIN
+const baseURL = import.meta.env.VITE_API_URL || '/api';
 
 const apiClient = axios.create({
     baseURL,
@@ -39,9 +40,8 @@ apiClient.interceptors.response.use(
       }
       const data = error.response.data || {};
       const backendMsg = data.message || data.title || data.detail || data.error;
-      const message = backendMsg || `Error ${status}`;
       // Preservar el objeto de error de Axios (incluye response/status) y ajustar el mensaje
-      error.message = message;
+      error.message = backendMsg || `Error ${status}`;
       return Promise.reject(error);
     }
     if (error.request) {

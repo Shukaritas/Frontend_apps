@@ -1,23 +1,31 @@
 import { CommunityRepository } from '../domain/repositories/community.repository.js';
 import { CommunityRecommendation } from '../domain/models/community-recommendation.entity.js';
-
-// Datos estáticos (no se consume API real para recomendaciones)
-const STATIC_RECOMMENDATIONS = [
-  new CommunityRecommendation(1, 'AgroExpert', 'Especialista', 'Optimiza riego temprano para mejorar retención de nutrientes.'),
-  new CommunityRecommendation(2, 'SoilGuru', 'Analista Suelos', 'Añade compost orgánico en parcelas con menor humedad.'),
-  new CommunityRecommendation(3, 'CropTech', 'Tecnólogo', 'Considera sensores de humedad en campos con variabilidad extrema.'),
-];
+import http from '@/services/http-common.js';
 
 /**
- *  CommunityRepository Assembler using HTTP API.
- * This class interacts with a RESTful API to fetch community recommendations.
- * It extends the abstract CommunityRepository and implements its methods.
+ *  CommunityRepository implementation using real HTTP API.
  */
 export class CommunityApiRepository extends CommunityRepository {
   async getRecommendations() {
-    return STATIC_RECOMMENDATIONS;
+    const resp = await http.get('/v1/CommunityRecommendation');
+    const data = Array.isArray(resp.data) ? resp.data : [];
+    return data.map(item => new CommunityRecommendation(
+      item.id,
+      item.user || item.userName || item.author || 'Community',
+      item.role || item.userRole || 'Member',
+      item.description || item.text || ''
+    ));
   }
+
   async getRecommendationById(id) {
-    return STATIC_RECOMMENDATIONS.find(r => r.id === Number(id)) || null;
+    const resp = await http.get(`/v1/CommunityRecommendation/${id}`);
+    const r = resp.data;
+    if (!r) return null;
+    return new CommunityRecommendation(
+      r.id,
+      r.user || r.userName || r.author || 'Community',
+      r.role || r.userRole || 'Member',
+      r.description || r.text || ''
+    );
   }
 }

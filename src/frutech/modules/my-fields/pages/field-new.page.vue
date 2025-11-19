@@ -66,7 +66,7 @@ const handleSubmit = async () => {
       name: fieldName.value,
       location: location.value,
       size: fieldSize.value,
-      imageUrl: imagePreviewUrl.value,
+      imageFile: imageFile.value,
     });
 
     router.push('/my-fields');

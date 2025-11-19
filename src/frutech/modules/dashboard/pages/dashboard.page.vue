@@ -20,7 +20,12 @@
           <template #content>
             <div class="field-items-container">
               <div v-for="field in store.dashboardData.previewFields" :key="field.id" class="field-item">
-                <img :src="field.imageUrl" :alt="field.title" class="field-image">
+                <img
+                  :src="field.imageUrl"
+                  :alt="field.title"
+                  class="field-image"
+                  @error="handleImageError"
+                >
                 <span class="field-title mt-2">{{ field.title }}</span>
               </div>
             </div>
@@ -92,6 +97,11 @@ const goToMyFields = () => {
 
 const goToMyTasks = () => {
   router.push('/my-tasks');
+};
+
+// Manejo de error de carga de imagen (fallback a placeholder)
+const handleImageError = (event) => {
+  event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
 };
 </script>
 

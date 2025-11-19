@@ -17,7 +17,12 @@
             <span :class="['status-dot', `status-${field.status.toLowerCase()}`]"></span>
             {{ field.status }}
           </div>
-          <img :src="field.imageUrl" :alt="field.name" class="field-image" />
+          <img
+            :src="field.imageUrl"
+            :alt="field.name"
+            class="field-image"
+            @error="handleImageError"
+          />
           <div class="field-info">
             <p class="field-name">{{ field.name }}</p>
             <p class="crop-info">{{ field.cropName }}</p>
@@ -45,6 +50,11 @@ onMounted(() => {
     fieldStore.fetchFields();
   }
 });
+
+// Manejo de error de carga de imagen (fallback a placeholder)
+const handleImageError = (event) => {
+  event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+};
 </script>
 
 <style scoped>
