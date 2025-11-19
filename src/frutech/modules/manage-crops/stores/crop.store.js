@@ -31,6 +31,7 @@ export const useCropStore = defineStore('crop', () => {
         } catch (err) {
             error.value = 'Could not load crops.';
             console.error(err);
+            crops.value = []; // limpiar lista para que la UI no se rompa
         } finally {
             isLoading.value = false;
         }
@@ -61,9 +62,9 @@ export const useCropStore = defineStore('crop', () => {
                 watering: cropData.watering || ''
             });
 
-            const createdEntity = await repository.create(cropEntity);
-            const newCropDTO = assembler.toDTO(createdEntity);
-            crops.value.push(newCropDTO);
+            await repository.create(cropEntity);
+            // Siempre recargar desde el servidor para reflejar IDs reales / resurrecciones
+            await fetchCrops();
         } catch (err) {
             error.value = 'Could not create crop.';
             console.error(err);

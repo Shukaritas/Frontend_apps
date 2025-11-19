@@ -32,15 +32,20 @@ export class CropApiRepository extends CropRepository {
     /**
      * Maps API data to the Crop domain model.
      * Backend likely returns PascalCase or camelCase. We normalize to domain shape.
+     *
+     * IMPORTANTE: Si el backend no devuelve el nombre del campo (fieldName),
+     * generamos un nombre genérico usando el fieldId para que la UI tenga algo que mostrar.
      */
     apiToDomain(apiData) {
+        const fieldId = apiData.fieldId ?? apiData.FieldId ?? apiData.field_id;
+        const fieldName = apiData.fieldName || apiData.field_name || (fieldId != null ? `Field #${fieldId}` : '');
         return new Crop({
             id: apiData.id ?? apiData.Id,
             title: apiData.cropType ?? apiData.CropType ?? apiData.crop ?? apiData.title,
             planting_date: apiData.plantingDate ?? apiData.PlantingDate ?? apiData.planting_date,
             harvest_date: apiData.harvestDate ?? apiData.HarvestDate ?? apiData.harvest_date,
-            field: apiData.fieldName ?? apiData.field_name ?? apiData.field ?? '',
-            fieldId: apiData.fieldId ?? apiData.FieldId ?? apiData.field_id,
+            field: fieldName,
+            fieldId: fieldId,
             status: apiData.status ?? apiData.Status,
             days: apiData.days ?? apiData.Days ?? apiData.days_since_planting ?? '0',
             soilType: apiData.soilType ?? apiData.SoilType ?? apiData.soil_type ?? '',

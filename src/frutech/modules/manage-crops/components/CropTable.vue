@@ -33,13 +33,13 @@
         
         <Column field="planting_date" :header="$t('manageCrops.plantingDate')" :sortable="true">
           <template #body="slotProps">
-            <Tag :value="slotProps.data.planting_date" severity="info" />
+            <Tag :value="formatDate(slotProps.data.planting_date)" severity="info" />
           </template>
         </Column>
         
         <Column field="harvest_date" :header="$t('manageCrops.harvestDate')" :sortable="true">
           <template #body="slotProps">
-            <Tag :value="slotProps.data.harvest_date" severity="success" />
+            <Tag :value="formatDate(slotProps.data.harvest_date)" severity="success" />
           </template>
         </Column>
         
@@ -137,6 +137,36 @@ import Tag from 'primevue/tag';
 import Badge from 'primevue/badge';
 import Dialog from 'primevue/dialog';
 import { useConfirm } from 'primevue/useconfirm';
+
+// Helper para formatear fechas a DD/MM/YYYY o devolver YYYY-MM-DD si se requiere
+function formatDate(value, mode = 'DMY') {
+  if (!value) return '';
+  let datePart = String(value);
+  // Cortar tiempo si viene en ISO extendido
+  if (datePart.includes('T')) datePart = datePart.split('T')[0];
+  // Si viene en YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+    const [y, m, d] = datePart.split('-');
+    return mode === 'DMY' ? `${d}/${m}/${y}` : `${y}-${m}-${d}`;
+  }
+  // Si viene en DD/MM/YYYY
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(datePart)) {
+    if (mode === 'DMY') return datePart;
+    const [d, m, y] = datePart.split('/');
+    return `${y}-${m}-${d}`;
+  }
+  // Intento genérico de parseo
+  try {
+    const d = new Date(datePart);
+    if (!isNaN(d.getTime())) {
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yy = d.getFullYear();
+      return mode === 'DMY' ? `${dd}/${mm}/${yy}` : `${yy}-${mm}-${dd}`;
+    }
+  } catch {}
+  return datePart; // fallback
+}
 
 const props = defineProps({
   crops: {
@@ -240,4 +270,3 @@ const deleteCrop = () => {
   border-bottom: 1px solid #e9ecef;
 }
 </style>
-

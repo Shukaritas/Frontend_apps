@@ -4,7 +4,7 @@ import http from '@/services/http-common.js';
 
 export class FieldApiRepository extends IFieldRepository {
   /**
-   * Obtiene todos los campos del usuario autenticado.
+   * Obtiene todos los campos del usuario autenticado usando únicamente el endpoint oficial.
    */
   async getAll() {
     const userRaw = localStorage.getItem('user');
@@ -18,27 +18,14 @@ export class FieldApiRepository extends IFieldRepository {
       throw new Error('Datos de usuario corruptos');
     }
 
-    // Aceptar userId numérico o string (GUID); sólo validamos que exista
     if (userId === undefined || userId === null || (typeof userId === 'string' && userId.trim() === '')) {
       throw new Error('ID de usuario inválido');
     }
 
-    // Usar endpoint oficial /api/v1/Fields/user/{userId}
-    try {
-      const response = await http.get(`/v1/Fields/user/${userId}`);
-      const data = Array.isArray(response.data) ? response.data : [];
-      return FieldAssembler.toModels(data);
-    } catch (e1) {
-      // Respaldo: /api/v1/Fields
-      try {
-        const resAll = await http.get('/v1/Fields');
-        const all = Array.isArray(resAll.data) ? resAll.data : [];
-        const mine = all.filter(f => String(f.userId ?? f.user_id) === String(userId));
-        return FieldAssembler.toModels(mine);
-      } catch (e2) {
-        return [];
-      }
-    }
+    // Único intento: endpoint correcto. Si falla se deja que el store maneje el error.
+    const response = await http.get(`/v1/Fields/user/${userId}`);
+    const data = Array.isArray(response.data) ? response.data : [];
+    return FieldAssembler.toModels(data);
   }
 
   async getById(id) {

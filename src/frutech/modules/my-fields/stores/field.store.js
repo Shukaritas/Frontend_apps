@@ -21,6 +21,7 @@ export const useFieldStore = defineStore('fields', () => {
     } catch (e) {
       error.value = 'No se pudieron cargar los campos.';
       console.error(e);
+      fields.value = []; // limpiar lista para evitar estados inconsistentes
     } finally {
       isLoading.value = false;
     }
@@ -28,12 +29,14 @@ export const useFieldStore = defineStore('fields', () => {
   async function fetchFieldById(id) {
     isLoading.value = true;
     error.value = null;
-    currentField.value = null;
+    currentField.value = null; // asegurar estado limpio antes
     try {
       currentField.value = await fieldRepository.getById(id);
+      if (!currentField.value) throw new Error('Campo no encontrado');
     } catch (e) {
       error.value = 'No se pudo cargar la información del campo.';
       console.error(e);
+      currentField.value = null; // aseguramos nulidad en error
     } finally {
       isLoading.value = false;
     }

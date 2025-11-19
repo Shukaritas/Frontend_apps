@@ -158,12 +158,31 @@ const onSubmitCrop = async (cropData) => {
     showCropForm.value = false;
     selectedCrop.value = null;
   } catch (error) {
+    // Extraer mensaje de error del backend si está disponible
+    let errorMessage = selectedCrop.value ? $t('manageCrops.errorUpdateCrop') : $t('manageCrops.errorCreateCrop');
+
+    // Intentar obtener el mensaje específico del backend
+    if (error.message) {
+      errorMessage = error.message;
+    } else if (error.response?.data?.message) {
+      errorMessage = error.response.data.message;
+    } else if (error.response?.data?.title) {
+      errorMessage = error.response.data.title;
+    } else if (error.response?.data?.errors) {
+      // Manejar errores de validación de .NET
+      const validationErrors = error.response.data.errors;
+      const errorMessages = Object.values(validationErrors).flat();
+      errorMessage = errorMessages.join(', ');
+    }
+
     toast.add({
       severity: 'error',
       summary: 'Error',
-      detail: selectedCrop.value ? $t('manageCrops.errorUpdateCrop') : $t('manageCrops.errorCreateCrop'),
-      life: 3000
+      detail: errorMessage,
+      life: 5000
     });
+
+    console.error('Error al procesar cultivo:', error);
   }
 };
 

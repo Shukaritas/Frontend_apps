@@ -20,7 +20,22 @@ function validateCrop({ id, title, planting_date, harvest_date, field, fieldId, 
     if (typeof title !== 'string' || title.length < 2) throw new Error('Title must be at least 2 characters long.');
     if (typeof planting_date !== 'string' || planting_date.length === 0) throw new Error('Planting date is required.');
     if (typeof harvest_date !== 'string' || harvest_date.length === 0) throw new Error('Harvest date is required.');
-    if (typeof field !== 'string' || field.length < 2) throw new Error('Field must be at least 2 characters long.');
+
+    // CORRECCIÓN: Validar field solo si NO hay fieldId válido
+    // Si fieldId es un número válido, field puede ser un string genérico o vacío
+    const hasValidFieldId = typeof fieldId === 'number' && fieldId > 0;
+    if (!hasValidFieldId) {
+        // Si no hay fieldId, field debe ser un string válido de al menos 2 caracteres
+        if (typeof field !== 'string' || field.length < 2) {
+            throw new Error('Field must be at least 2 characters long.');
+        }
+    } else {
+        // Si hay fieldId, field puede ser cualquier string (incluso genérico como "Field #1")
+        if (field !== undefined && field !== null && typeof field !== 'string') {
+            throw new Error('Field must be a string.');
+        }
+    }
+
     if (fieldId !== undefined && fieldId !== null && typeof fieldId !== 'number') throw new Error('Field ID must be a number.');
     if (typeof status !== 'string' || status.length === 0) throw new Error('Status is required.');
     if (typeof days !== 'string' || days.length === 0) throw new Error('Days is required.');
