@@ -3,6 +3,25 @@ import { CropRepository } from '../domain/repositories/crop.repository';
 import { Crop } from '../domain/models/crop.model';
 
 /**
+ * Convierte fecha DD/MM/YYYY a formato ISO YYYY-MM-DD
+ * @param {string} dateStr - Fecha en formato DD/MM/YYYY
+ * @returns {string} Fecha en formato ISO YYYY-MM-DD
+ */
+function convertToISODate(dateStr) {
+    if (!dateStr || typeof dateStr !== 'string') return '';
+
+    // Si ya viene en formato ISO, retornarla
+    if (dateStr.includes('-') && dateStr.length === 10) return dateStr;
+
+    // Convertir DD/MM/YYYY a YYYY-MM-DD
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return '';
+
+    const [day, month, year] = parts;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+}
+
+/**
  * @class CropApiRepository
  * @classdesc Repository implementation that interacts with a REST API to manage crops.
  * @extends CropRepository
@@ -17,27 +36,33 @@ export class CropApiRepository extends CropRepository {
     apiToDomain(apiData) {
         return new Crop({
             id: apiData.id ?? apiData.Id,
-            title: apiData.cropType ?? apiData.CropType ?? apiData.title,
+            title: apiData.cropType ?? apiData.CropType ?? apiData.crop ?? apiData.title,
             planting_date: apiData.plantingDate ?? apiData.PlantingDate ?? apiData.planting_date,
             harvest_date: apiData.harvestDate ?? apiData.HarvestDate ?? apiData.harvest_date,
-            field: apiData.fieldId ?? apiData.FieldId ?? apiData.field_id ?? apiData.field,
+            field: apiData.fieldName ?? apiData.field_name ?? apiData.field ?? '',
+            fieldId: apiData.fieldId ?? apiData.FieldId ?? apiData.field_id,
             status: apiData.status ?? apiData.Status,
-            days: apiData.days ?? apiData.Days ?? apiData.days_since_planting ?? '0'
+            days: apiData.days ?? apiData.Days ?? apiData.days_since_planting ?? '0',
+            soilType: apiData.soilType ?? apiData.SoilType ?? apiData.soil_type ?? '',
+            sunlight: apiData.sunlight ?? apiData.Sunlight ?? '',
+            watering: apiData.watering ?? apiData.Watering ?? ''
         });
     }
 
     /**
-     * Maps a Crop domain entity to API payload.
+     * Maps a Crop domain entity to API payload (CreateCropFieldCommand).
+     * IMPORTANTE: El backend espera propiedades en camelCase con estructura específica.
      */
     domainToApi(domainData) {
         return {
-            id: domainData.id,
-            cropType: domainData.title,
-            plantingDate: domainData.planting_date,
-            harvestDate: domainData.harvest_date,
-            fieldId: domainData.field,
+            fieldId: Number(domainData.fieldId), // DEBE ser número
+            crop: domainData.title, // El backend espera "crop", no "cropType"
+            soilType: domainData.soilType || '',
+            sunlight: domainData.sunlight || '',
+            watering: domainData.watering || '',
             status: domainData.status,
-            days: domainData.days
+            plantingDate: convertToISODate(domainData.planting_date), // Convertir a ISO
+            harvestDate: convertToISODate(domainData.harvest_date) // Convertir a ISO
         };
     }
 

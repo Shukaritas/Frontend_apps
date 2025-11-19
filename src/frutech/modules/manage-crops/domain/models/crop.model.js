@@ -7,18 +7,24 @@
  * @param {string} cropData.planting_date - The planting date.
  * @param {string} cropData.harvest_date - The harvest date.
  * @param {string} cropData.field - The field name.
+ * @param {number} cropData.fieldId - The field ID (numeric).
  * @param {string} cropData.status - The crop status.
  * @param {string} cropData.days - The days since planting.
+ * @param {string} cropData.soilType - The soil type (optional).
+ * @param {string} cropData.sunlight - The sunlight conditions (optional).
+ * @param {string} cropData.watering - The watering method (optional).
  * @throws {Error} If any validation fails.
  */
-function validateCrop({ id, title, planting_date, harvest_date, field, status, days }) {
+function validateCrop({ id, title, planting_date, harvest_date, field, fieldId, status, days, soilType, sunlight, watering }) {
     if (typeof id !== 'number') throw new Error('ID must be a number.');
     if (typeof title !== 'string' || title.length < 2) throw new Error('Title must be at least 2 characters long.');
     if (typeof planting_date !== 'string' || planting_date.length === 0) throw new Error('Planting date is required.');
     if (typeof harvest_date !== 'string' || harvest_date.length === 0) throw new Error('Harvest date is required.');
     if (typeof field !== 'string' || field.length < 2) throw new Error('Field must be at least 2 characters long.');
+    if (fieldId !== undefined && fieldId !== null && typeof fieldId !== 'number') throw new Error('Field ID must be a number.');
     if (typeof status !== 'string' || status.length === 0) throw new Error('Status is required.');
     if (typeof days !== 'string' || days.length === 0) throw new Error('Days is required.');
+    // soilType, sunlight, watering son opcionales, no los validamos estrictamente
 }
 
 /**
@@ -35,18 +41,26 @@ export class Crop {
      * @param {string} cropData.planting_date - The planting date.
      * @param {string} cropData.harvest_date - The harvest date.
      * @param {string} cropData.field - The field name.
+     * @param {number} cropData.fieldId - The field ID (numeric).
      * @param {string} cropData.status - The crop status.
      * @param {string} cropData.days - The days since planting.
+     * @param {string} cropData.soilType - The soil type (optional).
+     * @param {string} cropData.sunlight - The sunlight conditions (optional).
+     * @param {string} cropData.watering - The watering method (optional).
      */
-    constructor({ id, title, planting_date, harvest_date, field, status, days }) {
-        validateCrop({ id, title, planting_date, harvest_date, field, status, days });
+    constructor({ id, title, planting_date, harvest_date, field, fieldId, status, days, soilType, sunlight, watering }) {
+        validateCrop({ id, title, planting_date, harvest_date, field, fieldId, status, days, soilType, sunlight, watering });
         this.id = id;
         this.title = title;
         this.planting_date = planting_date;
         this.harvest_date = harvest_date;
         this.field = field;
+        this.fieldId = fieldId;
         this.status = status;
         this.days = days;
+        this.soilType = soilType || '';
+        this.sunlight = sunlight || '';
+        this.watering = watering || '';
     }
 
     /**
@@ -55,25 +69,37 @@ export class Crop {
      * @param {string} newPlantingDate - The new planting date.
      * @param {string} newHarvestDate - The new harvest date.
      * @param {string} newField - The new field.
+     * @param {number} newFieldId - The new field ID.
      * @param {string} newStatus - The new status.
      * @param {string} newDays - The new days.
+     * @param {string} newSoilType - The new soil type (optional).
+     * @param {string} newSunlight - The new sunlight (optional).
+     * @param {string} newWatering - The new watering (optional).
      */
-    updateInformation(newTitle, newPlantingDate, newHarvestDate, newField, newStatus, newDays) {
+    updateInformation(newTitle, newPlantingDate, newHarvestDate, newField, newFieldId, newStatus, newDays, newSoilType, newSunlight, newWatering) {
         validateCrop({
             id: this.id,
             title: newTitle,
             planting_date: newPlantingDate,
             harvest_date: newHarvestDate,
             field: newField,
+            fieldId: newFieldId,
             status: newStatus,
-            days: newDays
+            days: newDays,
+            soilType: newSoilType,
+            sunlight: newSunlight,
+            watering: newWatering
         });
         this.title = newTitle;
         this.planting_date = newPlantingDate;
         this.harvest_date = newHarvestDate;
         this.field = newField;
+        this.fieldId = newFieldId;
         this.status = newStatus;
         this.days = newDays;
+        this.soilType = newSoilType || '';
+        this.sunlight = newSunlight || '';
+        this.watering = newWatering || '';
     }
 
     /**

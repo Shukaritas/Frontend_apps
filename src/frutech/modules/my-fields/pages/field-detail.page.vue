@@ -23,7 +23,7 @@
       <div class="header-section">
         <div>
           <h2 class="field-name">{{ field.name }}</h2>
-          <p class="crop-name">{{ field.product }}</p>
+          <p class="crop-name">{{ field.crop }}</p>
         </div>
         <div class="status-badge">
           <span :class="['status-dot', `status-${field.status.toLowerCase()}`]"></span>
@@ -33,12 +33,12 @@
       <div class="main-content">
         <div class="info-card">
           <div class="info-item"><span>{{t('field_detail.location')}}</span> {{ field.location }}</div>
-          <div class="info-item"><span>{{t('field_detail.field_size')}}</span> {{ field.field_size }}</div>
+          <div class="info-item"><span>{{t('field_detail.field_size')}}</span> {{ field.fieldSize }}</div>
           <div class="info-item"><span>{{t('field_detail.crop')}}</span> {{ field.crop }}</div>
-          <div class="info-item"><span>{{t('field_detail.days_since')}}</span> {{ field.days_since_planting }} Days</div>
-          <div class="info-item"><span>{{t('field_detail.planting_date')}}:</span> {{ field.planting_date }}</div>
-          <div class="info-item"><span>{{t('field_detail.expected')}}</span> {{ field.expecting_harvest }}</div>
-          <div class="info-item"><span>{{t('field_detail.soil_type')}}</span> {{ field['Soil Type'] }}</div>
+          <div class="info-item"><span>{{t('field_detail.days_since')}}</span> {{ field.daysSincePlanting }} Days</div>
+          <div class="info-item"><span>{{t('field_detail.planting_date')}}:</span> {{ field.plantingDate }}</div>
+          <div class="info-item"><span>{{t('field_detail.expected')}}</span> {{ field.expectingHarvest }}</div>
+          <div class="info-item"><span>{{t('field_detail.soil_type')}}</span> {{ field.soilType }}</div>
           <div class="info-item"><span>{{t('field_detail.watering')}}</span> {{ field.watering }}</div>
           <div class="info-item"><span>{{t('field_detail.sunlight')}}</span> {{ field.sunlight }}</div>
         </div>

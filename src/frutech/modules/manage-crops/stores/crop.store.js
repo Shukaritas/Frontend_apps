@@ -38,7 +38,7 @@ export const useCropStore = defineStore('crop', () => {
 
     /**
      * Creates a new crop.
-     * @param {object} cropData - Object with crop data (title, planting_date, harvest_date, field, status, days).
+     * @param {object} cropData - Object with crop data (title, planting_date, harvest_date, field, fieldId, status, days, soilType, sunlight, watering).
      */
     async function createCrop(cropData) {
         isLoading.value = true;
@@ -53,8 +53,12 @@ export const useCropStore = defineStore('crop', () => {
                 planting_date: cropData.planting_date,
                 harvest_date: cropData.harvest_date,
                 field: cropData.field,
+                fieldId: cropData.fieldId, // ID numérico del campo
                 status: cropData.status,
-                days: cropData.days
+                days: cropData.days,
+                soilType: cropData.soilType || '',
+                sunlight: cropData.sunlight || '',
+                watering: cropData.watering || ''
             });
 
             const createdEntity = await repository.create(cropEntity);
@@ -84,8 +88,12 @@ export const useCropStore = defineStore('crop', () => {
                 cropData.planting_date,
                 cropData.harvest_date,
                 cropData.field,
+                cropData.fieldId,
                 cropData.status,
-                cropData.days
+                cropData.days,
+                cropData.soilType,
+                cropData.sunlight,
+                cropData.watering
             );
             
             const updatedEntity = await repository.update(currentEntity);

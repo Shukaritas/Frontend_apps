@@ -200,7 +200,15 @@ async function save() {
   }
 
   try {
-    const cropPayload = { ...form.value, days: totalCropDays };
+    // Construir el payload con fieldId numérico y todas las propiedades necesarias
+    const cropPayload = {
+      ...form.value,
+      days: totalCropDays,
+      fieldId: selectedFieldId.value, // ID numérico del campo seleccionado
+      soilType: form.value.soilType || '',
+      sunlight: form.value.sunlight || '',
+      watering: form.value.watering || ''
+    };
     await cropStore.createCrop(cropPayload);
     toast.add({ severity: 'success', summary: 'Éxito', detail: 'Cultivo creado correctamente.', life: 2000 });
   } catch (e) {
