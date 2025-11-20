@@ -72,11 +72,26 @@ export class CropApiRepository extends CropRepository {
     }
 
     /**
-     * Gets all crops from the API.
+     * Gets all crops from the API filtered by current user.
      * @returns {Promise<Array<Crop>>} Array of crop entities.
      */
     async getAll() {
-        const response = await http.get(this.endpoint);
+        const userRaw = localStorage.getItem('user');
+        if (!userRaw) throw new Error('Usuario no autenticado');
+
+        let userId;
+        try {
+            const parsed = JSON.parse(userRaw);
+            userId = parsed?.id;
+        } catch {
+            throw new Error('Datos de usuario corruptos');
+        }
+
+        if (userId === undefined || userId === null || (typeof userId === 'string' && userId.trim() === '')) {
+            throw new Error('ID de usuario inválido');
+        }
+
+        const response = await http.get(`${this.endpoint}/user/${userId}`);
         return Array.isArray(response.data) ? response.data.map(d => this.apiToDomain(d)) : [];
     }
 

@@ -66,11 +66,26 @@ export class TaskApiRepository extends TaskRepository {
   }
 
   /**
-   * Gets all tasks from the API.
+   * Gets all tasks from the API filtered by current user.
    * @returns {Promise<Array<Task>>} Array of task entities.
    */
   async getAll() {
-    const response = await apiClient.get(TASKS_ENDPOINT);
+    const userRaw = localStorage.getItem('user');
+    if (!userRaw) throw new Error('Usuario no autenticado');
+
+    let userId;
+    try {
+      const parsed = JSON.parse(userRaw);
+      userId = parsed?.id;
+    } catch {
+      throw new Error('Datos de usuario corruptos');
+    }
+
+    if (userId === undefined || userId === null || (typeof userId === 'string' && userId.trim() === '')) {
+      throw new Error('ID de usuario inválido');
+    }
+
+    const response = await apiClient.get(`${TASKS_ENDPOINT}/user/${userId}`);
     return Array.isArray(response.data) ? response.data.map(d => this.apiToDomain(d)) : [];
   }
 
