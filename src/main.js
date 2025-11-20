@@ -18,7 +18,6 @@ import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
-import Tooltip from 'primevue/tooltip';
 
 // Custom Global Styles
 import './assets/styles/global.css';
@@ -43,8 +42,5 @@ app.use(PrimeVue, {
 });
 app.use(ConfirmationService);
 app.use(ToastService);
-
-// Register Tooltip directive
-app.directive('tooltip', Tooltip);
 
 app.mount('#app');
