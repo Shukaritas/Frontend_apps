@@ -11,9 +11,9 @@ export class CommunityApiRepository extends CommunityRepository {
     const data = Array.isArray(resp.data) ? resp.data : [];
     return data.map(item => new CommunityRecommendation(
       item.id,
-      item.user || item.userName || item.author || 'Community',
-      item.role || item.userRole || 'Member',
-      item.description || item.text || ''
+      item.userName || item.user || item.author || 'Community',
+      item.commentDate || item.CommentDate || '',
+      item.comment || item.description || item.text || ''
     ));
   }
 
@@ -23,9 +23,50 @@ export class CommunityApiRepository extends CommunityRepository {
     if (!r) return null;
     return new CommunityRecommendation(
       r.id,
-      r.user || r.userName || r.author || 'Community',
-      r.role || r.userRole || 'Member',
-      r.description || r.text || ''
+      r.userName || r.user || r.author || 'Community',
+      r.commentDate || r.CommentDate || '',
+      r.comment || r.description || r.text || ''
+    );
+  }
+
+  async createRecommendation(payload) {
+    // payload: { userName, comment }
+    if (!payload || !payload.userName || !payload.comment) {
+      throw new Error('Payload inválido para crear comentario');
+    }
+    const resp = await http.post('/v1/CommunityRecommendation', {
+      userName: payload.userName,
+      comment: payload.comment
+    });
+    // Mapear respuesta a entidad
+    const data = resp.data || {};
+    return new CommunityRecommendation(
+      data.id,
+      data.userName || data.user || 'Community',
+      data.commentDate || data.CommentDate || '',
+      data.comment || data.description || data.text || payload.comment
+    );
+  }
+
+  /**
+   * Actualiza el contenido de un comentario existente.
+   * @param {number} id - ID del comentario a actualizar
+   * @param {string} comment - Nuevo texto del comentario
+   * @returns {Promise<CommunityRecommendation>}
+   */
+  async updateCommentContent(id, comment) {
+    if (!id || !comment || comment.trim().length === 0) {
+      throw new Error('ID y contenido del comentario son requeridos');
+    }
+    const resp = await http.patch(`/v1/CommunityRecommendation/${id}/content`, {
+      comment: comment.trim()
+    });
+    const data = resp.data || {};
+    return new CommunityRecommendation(
+      data.id || id,
+      data.userName || data.user || 'Community',
+      data.commentDate || data.CommentDate || '',
+      data.comment || data.description || data.text || comment
     );
   }
 }

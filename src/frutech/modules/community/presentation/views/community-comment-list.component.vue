@@ -15,6 +15,7 @@
       v-for="recommendation in communityStore.getRecommendations"
       :key="recommendation.id"
       :comment="recommendation"
+      @edit="$emit('edit', $event)"
     />
   </div>
 </template>
@@ -24,6 +25,8 @@ import { useCommunityStore } from '../../application/community.store.js';
 import CommunityCommentCard from './community-comment-card.component.vue';
 
 const communityStore = useCommunityStore();
+
+defineEmits(['edit']);
 </script>
 
 <style scoped>

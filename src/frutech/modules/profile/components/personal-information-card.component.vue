@@ -13,7 +13,9 @@
       <div class="field grid align-items-center">
         <label for="email" class="col-12 md:col-4">{{ t('profile.email') }}</label>
         <div class="col-12 md:col-8">
-          <InputText id="email" :model-value="profile.email" class="w-full" disabled />
+          <!-- Email ahora editable en modo edición -->
+          <InputText id="email" v-model="localProfile.email" class="w-full" :disabled="!isEditing" :invalid="!!errors.email" />
+          <small v-if="errors.email" class="p-error">{{ t(errors.email) }}</small>
         </div>
       </div>
 
@@ -28,8 +30,8 @@
       <div class="field grid align-items-center">
         <label for="doc" class="col-12 md:col-4">{{ t('profile.identityDocument') }}</label>
         <div class="col-12 md:col-8">
-          <InputText id="doc" v-model="localProfile.identificator" class="w-full" :disabled="!isEditing" :invalid="!!errors.identificator" />
-          <small v-if="errors.identificator" class="p-error">{{ t(errors.identificator) }}</small>
+          <!-- Campo de documento ahora siempre deshabilitado y sin validación visual -->
+          <InputText id="doc" v-model="localProfile.identificator" class="w-full" disabled />
         </div>
       </div>
 
@@ -73,18 +75,29 @@ watch(() => props.profile, (newVal) => {
 const validate = () => {
   Object.keys(errors).forEach(key => delete errors[key]);
   let isValid = true;
-  if (localProfile.name.length < 3) {
+
+  // Nombre mínimo 3 caracteres
+  if (!localProfile.name || localProfile.name.trim().length < 3) {
     errors.name = 'errors.nameLength';
     isValid = false;
   }
-  if (!/^\d{9}$/.test(localProfile.phoneNumber)) {
-    errors.phoneNumber = 'errors.phoneDigits';
+
+  // Teléfono internacional (+ seguido de dígitos)
+  if (!/^\+\d+$/.test(localProfile.phoneNumber || '')) {
+    errors.phoneNumber = 'errors.phoneDigits'; // Reusar clave existente
     isValid = false;
   }
-  if (!/^\d{8}$/.test(localProfile.identificator)) {
-    errors.identificator = 'errors.documentDigits';
+
+  // Eliminada validación de identificator (campo read-only)
+
+  // Email requerido y formato básico
+  const email = localProfile.email || '';
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // formato simple
+  if (!email || !emailRegex.test(email)) {
+    errors.email = 'errors.emailInvalid';
     isValid = false;
   }
+
   return isValid;
 }
 

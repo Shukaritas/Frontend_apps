@@ -1,23 +1,118 @@
 <template>
   <div class="community-page">
-    <CommunityHeader />
-    <div class="community-content">
-      <CommunityCommentList />
+    <div class="header-row">
+      <CommunityHeader />
+      <Button label="Add Comment" icon="pi pi-plus" @click="openNewCommentDialog" class="add-comment-btn" />
     </div>
+    <div class="community-content">
+      <CommunityCommentList @edit="handleEditComment" />
+    </div>
+
+    <!-- Dialog mejorado con modo edición -->
+    <Dialog
+      v-model:visible="showDialog"
+      :header="editingComment ? 'Edit Comment' : 'New Comment'"
+      :modal="true"
+      :closable="true"
+      @hide="resetDialog"
+      :style="{ width: '450px' }"
+    >
+      <div class="flex flex-column gap-3">
+        <div class="field">
+          <label for="commentText" class="font-semibold">Comment</label>
+          <Textarea
+            id="commentText"
+            v-model="newComment"
+            rows="5"
+            autoResize
+            class="w-full"
+            placeholder="Write your comment..."
+            :class="{ 'p-invalid': submitAttempt && !newComment.trim() }"
+          />
+          <small v-if="submitAttempt && !newComment.trim()" class="p-error">Comment is required</small>
+        </div>
+      </div>
+      <template #footer>
+        <div class="flex justify-content-end gap-2">
+          <Button label="Cancel" text @click="showDialog = false; resetDialog()" />
+          <Button
+            :label="editingComment ? 'Update' : 'Post'"
+            :disabled="posting"
+            :loading="posting"
+            @click="onSubmitComment"
+          />
+        </div>
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useCommunityStore } from '../application/community.store.js';
 import CommunityHeader from '../presentation/views/community-header.component.vue';
 import CommunityCommentList from '../presentation/views/community-comment-list.component.vue';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import Textarea from 'primevue/textarea';
+import { useToast } from 'primevue/usetoast';
 
 const communityStore = useCommunityStore();
+const toast = useToast();
+
+const showDialog = ref(false);
+const newComment = ref('');
+const submitAttempt = ref(false);
+const posting = ref(false);
+const editingComment = ref(null); // Guarda el comentario que se está editando
 
 onMounted(async () => {
   await communityStore.fetchRecommendations();
 });
+
+function openNewCommentDialog() {
+  editingComment.value = null;
+  newComment.value = '';
+  submitAttempt.value = false;
+  showDialog.value = true;
+}
+
+function handleEditComment(comment) {
+  editingComment.value = comment;
+  newComment.value = comment.description || '';
+  submitAttempt.value = false;
+  showDialog.value = true;
+}
+
+function resetDialog() {
+  newComment.value = '';
+  submitAttempt.value = false;
+  posting.value = false;
+  editingComment.value = null;
+}
+
+async function onSubmitComment() {
+  submitAttempt.value = true;
+  if (!newComment.value.trim()) return;
+  posting.value = true;
+  try {
+    if (editingComment.value) {
+      // Modo edición
+      await communityStore.editComment(editingComment.value.id, newComment.value);
+      toast.add({ severity: 'success', summary: 'Comentario actualizado', life: 2500 });
+    } else {
+      // Modo creación
+      await communityStore.createComment(newComment.value);
+      toast.add({ severity: 'success', summary: 'Comentario publicado', life: 2500 });
+    }
+    showDialog.value = false;
+    resetDialog();
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 3000 });
+  } finally {
+    posting.value = false;
+  }
+}
 </script>
 
 <style scoped>
@@ -26,8 +121,21 @@ onMounted(async () => {
   flex-direction: column;
   gap: 1.5rem;
 }
-
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.add-comment-btn {
+  align-self: center;
+}
 .community-content {
   width: 100%;
+}
+.field label {
+  font-weight: 600;
+  margin-bottom: .25rem;
+  display: inline-block;
 }
 </style>

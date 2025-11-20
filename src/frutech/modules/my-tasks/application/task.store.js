@@ -3,12 +3,10 @@ import { ref, computed } from 'vue';
 import { TaskApiRepository } from '../infrastructure/task-api.repository';
 import { TaskAssembler } from './task.assembler';
 import { Task } from '../domain/models/task.entity';
-import { FieldApiRepository } from "@/frutech/modules/my-fields/infrastructure/field.api-repository.js";
-import { useDashboardStore } from '@/frutech/modules/dashboard/stores/dashboard.store.js'; // <-- AÑADIDO: Importar el store del dashboard
+import { useDashboardStore } from '@/frutech/modules/dashboard/stores/dashboard.store.js';
 
 const repository = new TaskApiRepository();
 const assembler = new TaskAssembler();
-const fieldRepository = new FieldApiRepository();
 
 /**
  * @store useTaskStore
@@ -105,23 +103,16 @@ export const useTaskStore = defineStore('tasks', () => {
         isLoading.value = true;
         error.value = null;
         try {
+            // Obtener y actualizar la tarea
             const taskEntity = await repository.getById(taskId);
             taskEntity.updateInformation(dataToUpdate.description, dataToUpdate.dueDate, dataToUpdate.field);
             const updatedEntity = await repository.update(taskEntity);
-            const allFields = await fieldRepository.getAllFieldsDetails();
-            const fieldToUpdate = allFields.find(f => f.tasks?.some(t => t.id === taskId));
-            if (fieldToUpdate) {
-                const taskIndex = fieldToUpdate.tasks.findIndex(t => t.id === taskId);
-                if (taskIndex !== -1) {
-                    fieldToUpdate.tasks[taskIndex].task = updatedEntity.description;
-                    fieldToUpdate.tasks[taskIndex].date = updatedEntity.dueDate;
-                    await fieldRepository.updateField(fieldToUpdate.id, { tasks: fieldToUpdate.tasks });
-                }
-            }
-            await fieldRepository.updateUpcomingTask(taskId, { task: updatedEntity.description, date: updatedEntity.dueDate });
 
+            // Actualizar el estado local
             const index = tasks.value.findIndex((t) => t.id === taskId);
-            if (index !== -1) tasks.value[index] = assembler.toDTO(updatedEntity);
+            if (index !== -1) {
+                tasks.value[index] = assembler.toDTO(updatedEntity);
+            }
 
         } catch (err) {
             error.value = 'Could not update task.';
@@ -168,21 +159,13 @@ export const useTaskStore = defineStore('tasks', () => {
         isLoading.value = true;
         error.value = null;
         try {
-            await Promise.all([
-                repository.delete(taskId),
-                fieldRepository.deleteUpcomingTask(taskId),
-                (async () => {
-                    const allFields = await fieldRepository.getAllFieldsDetails();
-                    const fieldToUpdate = allFields.find(f => f.tasks?.some(t => t.id === taskId));
-                    if (fieldToUpdate) {
-                        const updatedTasks = fieldToUpdate.tasks.filter(t => t.id !== taskId);
-                        await fieldRepository.updateField(fieldToUpdate.id, { tasks: updatedTasks });
-                    }
-                })()
-            ]);
+            // Eliminar la tarea del backend
+            await repository.delete(taskId);
 
+            // Actualizar el estado local
             tasks.value = tasks.value.filter((t) => t.id !== taskId);
 
+            // Refrescar datos del dashboard
             const dashboardStore = useDashboardStore();
             dashboardStore.fetchDashboardData();
 

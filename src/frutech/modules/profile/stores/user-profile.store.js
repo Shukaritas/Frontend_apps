@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { UserProfileApiRepository } from '../infrastructure/user-profile.api-repository';
 import { UserProfileAssembler } from '../application/user-profile.assembler';
+import { useAuthStore } from '@/stores/auth.store.js'; // nuevo import para logout y sincronización
 
 // Instanciamos las dependencias (Infraestructura y Application)
 const repository = new UserProfileApiRepository();
@@ -21,6 +22,7 @@ export const useUserProfileStore = defineStore('user-profile', () => {
 
     // Getters (Computed)
     const hasProfile = computed(() => !!profile.value);
+    const isLoading = computed(() => loading.value); // alias para la página que usa isLoading
 
     /**
      * Obtiene el perfil desde la API usando el Repositorio corregido.
@@ -52,10 +54,16 @@ export const useUserProfileStore = defineStore('user-profile', () => {
         if (!profile.value) return;
         loading.value = true;
         error.value = null;
-
+        const oldEmail = profile.value.email; // guardar email anterior
+        let emailChanged = false;
         try {
             // 1. Obtenemos la entidad actual fresca desde el repositorio
             const currentEntity = await repository.getById(profile.value.id);
+
+            // Actualizar email si viene en el payload y es distinto
+            if (dataToUpdate.email && dataToUpdate.email !== currentEntity.email) {
+                currentEntity.email = dataToUpdate.email.trim();
+            }
 
             // 2. Aplicamos la lógica de negocio del Dominio
             currentEntity.updateInformation(
@@ -70,6 +78,29 @@ export const useUserProfileStore = defineStore('user-profile', () => {
             // 4. Actualizamos el estado local con la respuesta
             profile.value = assembler.toDTO(updatedEntity);
 
+            // Sincronizar nombre con sesión local (authStore + localStorage) si sigue autenticado
+            if (!emailChanged) { // aún no se ha marcado cambio de email
+                const authStore = useAuthStore();
+                if (authStore.user) {
+                    const newName = updatedEntity.name || profile.value.name;
+                    authStore.user.username = newName;
+                    try {
+                        const stored = JSON.parse(localStorage.getItem('user') || '{}');
+                        stored.username = newName;
+                        localStorage.setItem('user', JSON.stringify(stored));
+                    } catch (e) {
+                        // Si hay corrupción en localStorage, reescribimos completamente
+                        localStorage.setItem('user', JSON.stringify({ id: authStore.user.id, username: newName, email: authStore.user.email }));
+                    }
+                }
+            }
+
+            // Comparar email para saber si se requiere logout
+            if (oldEmail !== dataToUpdate.email) {
+                emailChanged = true;
+                const authStore = useAuthStore();
+                authStore.logout();
+            }
         } catch (err) {
             error.value = 'No se pudo actualizar el perfil.';
             console.error(err);
@@ -77,6 +108,7 @@ export const useUserProfileStore = defineStore('user-profile', () => {
         } finally {
             loading.value = false;
         }
+        return { emailChanged };
     }
 
     /**
@@ -121,6 +153,7 @@ export const useUserProfileStore = defineStore('user-profile', () => {
     return {
         profile,
         loading, // Exportamos 'loading' para que el v-if de la página funcione
+        isLoading, // export alias
         error,
         hasProfile,
         fetchProfile,

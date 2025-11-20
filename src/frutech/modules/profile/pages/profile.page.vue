@@ -87,7 +87,12 @@ onMounted(() => {
  */
 const onUpdateProfile = async (data) => {
   try {
-    await userProfileStore.updateProfile(data);
+    const result = await userProfileStore.updateProfile(data);
+    if (result?.emailChanged) {
+      toast.add({ severity: 'info', summary: 'Info', detail: t('toast.emailChangedReLogin') || 'Email changed. Please log in again.', life: 3500 });
+      router.push('/login');
+      return; // evitar mostrar el toast de éxito estándar
+    }
     toast.add({ severity: 'success', summary: 'Success', detail: t('toast.profileUpdated'), life: 3000 });
   } catch (err) {
     toast.add({ severity: 'error', summary: 'Error', detail: t('toast.errorProfileUpdate'), life: 3000 });

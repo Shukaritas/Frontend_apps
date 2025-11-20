@@ -1,22 +1,28 @@
 /**
- * Entity representing a community recommendation.
- * This class encapsulates the properties and methods related to a community recommendation.
- * It includes methods for serialization and deserialization from JSON.
+ * Entity representing a community recommendation / comment.
+ * Backend structure:
+ * {
+ *   id: number,
+ *   userName: string,
+ *   commentDate: string (ISO),
+ *   comment: string
+ * }
  */
 export class CommunityRecommendation {
-  constructor(id, user, role, description) {
+  constructor(id, user, date, description) {
     this.id = id;
     this.user = user;
-    this.role = role;
+    this.date = date; // ISO or display string
     this.description = description;
   }
 
   static fromJSON(json) {
+    if (!json) return null;
     return new CommunityRecommendation(
       json.id,
-      json.user,
-      json.role,
-      json.description
+      json.user || json.userName || json.author || 'Community',
+      json.commentDate || json.CommentDate || json.date || json.Date || '',
+      json.comment || json.description || json.text || ''
     );
   }
 
@@ -24,7 +30,7 @@ export class CommunityRecommendation {
     return {
       id: this.id,
       user: this.user,
-      role: this.role,
+      date: this.date,
       description: this.description
     };
   }

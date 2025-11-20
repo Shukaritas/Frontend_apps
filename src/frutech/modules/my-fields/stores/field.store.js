@@ -3,6 +3,44 @@ import { ref } from 'vue';
 import { FieldApiRepository } from '../infrastructure/field.api-repository.js';
 import { useDashboardStore } from '@/frutech/modules/dashboard/stores/dashboard.store.js';
 import { useAuthStore } from '@/stores/auth.store.js';
+
+/**
+ * Convierte fecha DD/MM a formato ISO YYYY-MM-DD usando el año actual
+ * @param {string} dateStr - Fecha en formato DD/MM
+ * @returns {string} Fecha en formato ISO YYYY-MM-DD
+ */
+function convertShortDateToISO(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') {
+    return new Date().toISOString().split('T')[0]; // Fecha actual como fallback
+  }
+
+  // Si ya está en formato ISO, retornar
+  if (/^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+    return dateStr.split('T')[0];
+  }
+
+  // Parsear DD/MM y agregar año actual
+  const parts = dateStr.split('/');
+  if (parts.length === 2) {
+    const [day, month] = parts;
+    const currentYear = new Date().getFullYear();
+    if (day && month && !isNaN(day) && !isNaN(month)) {
+      return `${currentYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+  }
+
+  // Si tiene 3 partes (DD/MM/YYYY), convertir normalmente
+  if (parts.length === 3) {
+    const [day, month, year] = parts;
+    if (day && month && year && !isNaN(day) && !isNaN(month) && !isNaN(year)) {
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+  }
+
+  // Fallback: fecha actual
+  return new Date().toISOString().split('T')[0];
+}
+
 const fieldRepository = new FieldApiRepository();
 
 
@@ -73,12 +111,30 @@ export const useFieldStore = defineStore('fields', () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const updatedField = await fieldRepository.updateField(fieldId, {
-        progress_history: [newProgress]
+      // Verificar que tenemos el campo actual cargado
+      if (!currentField.value || currentField.value.id !== fieldId) {
+        await fetchFieldById(fieldId);
+      }
+
+      // Obtener el ID del registro de progreso más reciente
+      const progressHistoryId = currentField.value.progressHistoryId;
+
+      if (!progressHistoryId) {
+        throw new Error('No se encontró un registro de progreso para actualizar');
+      }
+
+      // Usar el endpoint correcto: PUT /v1/progress/{id}
+      await fieldRepository.updateProgress(progressHistoryId, {
+        watered: newProgress.watered ?? false,
+        fertilized: newProgress.fertilized ?? false,
+        pests: newProgress.pests ?? false
       });
-      currentField.value = updatedField;
+
+      // Recargar el campo completo desde el servidor para obtener los datos actualizados
+      await fetchFieldById(fieldId);
     } catch (e) {
-      error.value = 'Failed to update progress.';
+      error.value = 'No se pudo actualizar el progreso del campo.';
+      console.error(e);
       throw e;
     } finally {
       isLoading.value = false;
@@ -89,30 +145,43 @@ export const useFieldStore = defineStore('fields', () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const newTaskInGlobalList = await fieldRepository.addNewTask({
+      // Convertir fecha DD/MM a formato ISO YYYY-MM-DD
+      const isoDate = convertShortDateToISO(taskData.date);
+
+      // Preparar payload según CreateTaskResource del backend
+      const payload = {
+        fieldId: fieldId,
         description: taskData.task,
-        due_date: taskData.date,
-        field: taskData.name
-      });
+        dueDate: isoDate
+      };
 
-      const currentTasks = currentField.value.tasks || [];
-      const newTasksArray = [
-        ...currentTasks,
-        {
-          id: newTaskInGlobalList.id,
-          date: taskData.date,
+      // Crear la tarea en el backend
+      const newTaskFromBackend = await fieldRepository.addNewTask(payload);
+
+      // Actualizar el estado local agregando la nueva tarea
+      if (currentField.value) {
+        const currentTasks = currentField.value.tasks || [];
+
+        // Transformar la respuesta del backend al formato que usa la vista
+        const newTaskForView = {
+          id: newTaskFromBackend.id ?? newTaskFromBackend.Id,
+          description: newTaskFromBackend.description ?? newTaskFromBackend.Description,
+          dueDate: newTaskFromBackend.dueDate ?? newTaskFromBackend.DueDate,
+          date: taskData.date, // Mantener formato original para la vista
+          completed: newTaskFromBackend.completed ?? newTaskFromBackend.Completed ?? false,
           name: taskData.name,
-          task: taskData.task,
-        }
-      ];
+          task: taskData.task
+        };
 
-      const updatedField = await fieldRepository.updateField(fieldId, {
-        tasks: newTasksArray
-      });
-
-      currentField.value = updatedField;
+        // Actualizar el estado local sin hacer otra petición al servidor
+        currentField.value = {
+          ...currentField.value,
+          tasks: [...currentTasks, newTaskForView]
+        };
+      }
     } catch (e) {
-      error.value = 'Failed to add task.';
+      error.value = 'No se pudo agregar la tarea.';
+      console.error(e);
       throw e;
     } finally {
       isLoading.value = false;

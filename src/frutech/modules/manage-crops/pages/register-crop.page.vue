@@ -46,7 +46,7 @@
       >
         <div class="image-wrapper">
           <img :src="field.image_url" :alt="field.title" />
-          <Tag class="status-badge" :value="field.status" :severity="statusSeverity(field.status)" />
+          <Tag v-if="field.status" class="status-badge" :value="field.status" :severity="statusSeverity(field.status)" />
         </div>
         <div class="field-info">
           <div class="field-title">{{ field.title }}</div>
@@ -110,17 +110,20 @@ const previewFieldsWithStatus = ref([]);
 
 onMounted(async () => {
   try {
-    // Cargamos los fields del usuario usando el store/repositorio real (/api/v1/Fields/user/:id)
     await fieldStore.fetchFields();
-    // Mapear a la vista esperada (con status/crop/days); si el backend no provee, usar valores por defecto
-    previewFieldsWithStatus.value = (fieldStore.fields || []).map(f => ({
-      id: f.id,
-      title: f.name,
-      image_url: f.imageUrl,
-      status: f.status || 'Healthy',
-      crop: f.cropName || '—',
-      days: '0'
-    }));
+    previewFieldsWithStatus.value = (fieldStore.fields || []).map(f => {
+      const rawCropName = f.cropName || f.crop || ''; // diferentes fuentes
+      const hasCrop = rawCropName && rawCropName.trim() !== '' && rawCropName !== 'Sin Cultivo' && rawCropName !== '—';
+      return {
+        id: f.id,
+        title: f.name,
+        image_url: f.imageUrl,
+        // Solo asignar el status si realmente hay un cultivo activo
+        status: hasCrop ? f.status : null,
+        crop: hasCrop ? rawCropName : '—',
+        days: '0'
+      };
+    });
   } catch (err) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los campos.', life: 3000 });
   }

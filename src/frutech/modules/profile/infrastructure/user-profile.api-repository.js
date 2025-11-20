@@ -34,10 +34,9 @@ export class UserProfileApiRepository extends UserProfileRepository {
      */
     domainToProfilePayload(entity) {
         return {
-            name: entity.name,
-            phoneNumber: entity.phoneNumber,
-            identificator: entity.identificator,
+            userName: entity.name, // backend espera UserName
             email: entity.email,
+            phoneNumber: entity.phoneNumber,
         };
     }
 
@@ -49,8 +48,11 @@ export class UserProfileApiRepository extends UserProfileRepository {
     async update(userProfile) {
         const payload = this.domainToProfilePayload(userProfile);
         const resp = await http.put(`${this.endpoint}/${userProfile.id}/profile`, payload);
-        // Si la API no devuelve el recurso completo, rehidratamos con lo enviado
         const data = resp?.data && typeof resp.data === 'object' ? resp.data : payload;
+        // Si el backend no retorna identificator, preservar el existente para pasar validación del dominio
+        if (!('identificator' in data) && !('Identificator' in data)) {
+            data.identificator = userProfile.identificator;
+        }
         return this.apiToDomain({ id: userProfile.id, ...data });
     }
 

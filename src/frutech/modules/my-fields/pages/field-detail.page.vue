@@ -170,11 +170,34 @@ const saveProgress = async () => {
 };
 
 const saveTask = async () => {
+  // Validar que la descripción tenga al menos 3 caracteres
+  if (!newTaskData.task || newTaskData.task.trim().length < 3) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Validación',
+      detail: 'La descripción debe tener al menos 3 caracteres.',
+      life: 3000
+    });
+    return;
+  }
+
   try {
     await fieldStore.addTaskToField(field.value.id, newTaskData);
     isTaskModalVisible.value = false;
+    toast.add({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Tarea agregada correctamente',
+      life: 3000
+    });
   } catch (error) {
     console.error('Failed to save task:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No se pudo guardar la tarea',
+      life: 3000
+    });
   }
 };
 

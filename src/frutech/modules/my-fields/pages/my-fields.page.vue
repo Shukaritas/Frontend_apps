@@ -46,9 +46,8 @@ const { t } = useI18n({ useScope: 'global' });
 const fieldStore = useFieldStore();
 
 onMounted(() => {
-  if (fieldStore.fields.length === 0) {
-    fieldStore.fetchFields();
-  }
+  // Forzar recarga de campos cada vez que se monta la página
+  fieldStore.fetchFields();
 });
 
 // Manejo de error de carga de imagen (fallback a placeholder)

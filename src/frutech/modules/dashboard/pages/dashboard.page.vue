@@ -1,14 +1,14 @@
 <template>
   <div class="dashboard-page">
-    <div v-if="store.isLoading" class="flex justify-content-center align-items-center h-20rem">
+    <div v-if="isLoading" class="flex justify-content-center align-items-center h-20rem">
       <ProgressSpinner />
     </div>
 
-    <div v-else-if="store.error" class="p-4">
-      <Message severity="error" :closable="false">{{ store.error }}</Message>
+    <div v-else-if="error" class="p-4">
+      <Message severity="error" :closable="false">{{ error }}</Message>
     </div>
 
-    <div v-else-if="store.dashboardData" class="grid gap-4">
+    <div v-else class="grid gap-4">
       <div class="col-12">
         <Card class="preview-fields-card">
           <template #title>
@@ -19,14 +19,14 @@
           </template>
           <template #content>
             <div class="field-items-container">
-              <div v-for="field in store.dashboardData.previewFields" :key="field.id" class="field-item">
+              <div v-for="field in userFields" :key="field.id" class="field-item">
                 <img
                   :src="field.imageUrl"
-                  :alt="field.title"
+                  :alt="field.name"
                   class="field-image"
                   @error="handleImageError"
                 >
-                <span class="field-title mt-2">{{ field.title }}</span>
+                <span class="field-title mt-2">{{ field.name }}</span>
               </div>
             </div>
           </template>
@@ -38,13 +38,14 @@
           <template #title>
             <div class="flex justify-content-between align-items-center">
               <h2 class="m-0 text-xl font-semibold">{{ $t('sidebar.myTasks') }}</h2>
-                <Button :label="$t('dashboard.view_tasks')" @click="goToMyTasks" text />
-          </div></template>
+              <Button :label="$t('dashboard.view_tasks')" @click="goToMyTasks" text />
+            </div>
+          </template>
           <template #content>
-            <DataTable :value="store.dashboardData.upcomingTasks" responsiveLayout="scroll">
-              <Column field="name" :header="$t('dashboard.crop_name')"></Column>
-              <Column field="task" :header="$t('dashboard.task')"></Column>
-              <Column field="date" :header="$t('dashboard.due_date')"></Column>
+            <DataTable :value="upcomingTasks" responsiveLayout="scroll">
+              <Column field="field" :header="$t('dashboard.crop_name')"></Column>
+              <Column field="description" :header="$t('dashboard.task')"></Column>
+              <Column field="dueDate" :header="$t('dashboard.due_date')"></Column>
               <Column :header="$t('dashboard.actions')">
                 <template #body>
                   <Checkbox :binary="true" />
@@ -55,11 +56,12 @@
         </Card>
       </div>
 
-      <div class="col-12">
+      <!-- Recomendaciones mantiene la estructura original si existe otra fuente de datos -->
+      <div class="col-12" v-if="recommendations.length">
         <Card>
           <template #title><h2 class="m-0 text-xl font-semibold">{{ $t('dashboard.recommendatios') }}</h2></template>
           <template #content>
-            <div v-for="rec in store.dashboardData.recommendations" :key="rec.id" class="mb-3">
+            <div v-for="rec in recommendations" :key="rec.id" class="mb-3">
               <p><strong class="font-semibold">{{ rec.title }}:</strong> {{ rec.content }}</p>
             </div>
           </template>
@@ -70,25 +72,73 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useDashboardStore } from '../stores/dashboard.store';
-
+import { ref, onMounted } from 'vue';
 import Card from 'primevue/card';
 import Button from 'primevue/button';
 import ProgressSpinner from 'primevue/progressspinner';
 import Message from 'primevue/message';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import { useRouter } from 'vue-router';
 import Checkbox from 'primevue/checkbox';
+import { useRouter } from 'vue-router';
 
-const store = useDashboardStore();
+import { FieldApiRepository } from '@/frutech/modules/my-fields/infrastructure/field.api-repository.js';
+import { TaskApiRepository } from '@/frutech/modules/my-tasks/infrastructure/task-api.repository.js';
+
 const router = useRouter();
+const fieldRepository = new FieldApiRepository();
+const taskRepository = new TaskApiRepository();
+
+const isLoading = ref(false);
+const error = ref(null);
+
+const userFields = ref([]);
+const upcomingTasks = ref([]);
+const recommendations = ref([]); // placeholder si luego hay recomendaciones reales
+
+function getCurrentUserId() {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return user?.id;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchDashboardData() {
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    const userId = getCurrentUserId();
+    if (!userId) throw new Error('Usuario no autenticado');
+
+    // Cargar Fields del usuario
+    const fields = await fieldRepository.getAll();
+    userFields.value = Array.isArray(fields)
+      ? fields.map(f => ({ id: f.id, name: f.name, imageUrl: f.imageUrl }))
+      : [];
+
+    // Cargar 3 tareas próximas del usuario
+    const tasks = await taskRepository.getUpcomingTasks(userId, 3);
+    upcomingTasks.value = Array.isArray(tasks) ? tasks.map(t => ({
+      id: t.id,
+      description: t.description,
+      // TaskApiRepository ya convierte dueDate a DD/MM vía apiToDomain
+      dueDate: t.dueDate,
+      field: t.field,
+      completed: t.completed
+    })) : [];
+  } catch (e) {
+    console.error(e);
+    error.value = e.message || 'Error cargando datos del dashboard';
+  } finally {
+    isLoading.value = false;
+  }
+}
 
 onMounted(() => {
-  if (!store.dashboardData) {
-    store.fetchDashboardData();
-  }
+  fetchDashboardData();
 });
 
 const goToMyFields = () => {

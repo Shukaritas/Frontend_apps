@@ -1,14 +1,13 @@
 /**
- * Data Transfer Object for Community Recommendation.
- * This class is used to transfer data between different layers of the application.
- * It encapsulates the properties of a community recommendation.
+ * Data Transfer Object for Community Recommendation / Comment.
+ * Reflects backend structure without legacy 'role'.
  */
 
 export class CommunityRecommendationDTO {
-  constructor(id, user, role, description) {
+  constructor(id, user, date, description) {
     this.id = id;
     this.user = user;
-    this.role = role;
+    this.date = date; // formatted or ISO date string
     this.description = description;
   }
 }
