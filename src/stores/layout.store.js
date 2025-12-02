@@ -16,7 +16,7 @@ export const useLayoutStore = defineStore('layout', () => {
 
     /**
      * Holds the user's location info once fetched. Null until loaded.
-     * @type {import('vue').Ref<{region: string, country: string} | null>}
+     * @type {import('vue').Ref<{city: string, country_name: string} | null>}
      */
     const userLocation = ref(null);
 
@@ -32,17 +32,19 @@ export const useLayoutStore = defineStore('layout', () => {
      * If already fetched, it does nothing to avoid extra network calls.
      */
     async function fetchUserLocation() {
-        if (userLocation.value) return; // cache guard
+        if (userLocation.value) return; // cache guard: evita llamadas repetidas
         try {
             const { data } = await apiClient.get('/v1/location');
-            // Normalize potential key naming from backend response
-            const region = data?.region ?? data?.Region ?? null;
-            const country = data?.country ?? data?.Country ?? null;
-            if (region || country) {
-                userLocation.value = { region: region || '', country: country || '' };
+            // Normalizar las claves que vienen del backend
+            const city = data?.city ?? data?.City ?? '';
+            const country_name = data?.country_name ?? data?.countryName ?? data?.Country ?? '';
+
+            if (city || country_name) {
+                userLocation.value = { city, country_name };
             }
-        } catch (_) {
-            // Silently ignore; UI will remain in loading state or handle absence gracefully
+        } catch (error) {
+            // Silenciosamente ignorar errores; el UI mostrará "Cargando..." indefinidamente
+            console.error('Error fetching user location:', error);
         }
     }
 

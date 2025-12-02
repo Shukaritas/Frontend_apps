@@ -19,10 +19,10 @@
     <!-- Sección de ubicación del usuario al fondo -->
     <div class="mt-auto p-3 text-sm text-color-secondary">
       <template v-if="layoutStore.userLocation">
-        <span>📍 {{ layoutStore.userLocation.region }}, {{ layoutStore.userLocation.country }}</span>
+        <span> {{ layoutStore.userLocation.city }}, {{ layoutStore.userLocation.country_name }}</span>
       </template>
       <template v-else>
-        <span> Cargando... </span>
+        <span> Cargando ubicación...</span>
       </template>
     </div>
   </aside>
