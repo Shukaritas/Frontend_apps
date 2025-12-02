@@ -15,6 +15,16 @@
         </router-link>
       </li>
     </ul>
+
+    <!-- Sección de ubicación del usuario al fondo -->
+    <div class="mt-auto p-3 text-sm text-color-secondary">
+      <template v-if="layoutStore.userLocation">
+        <span>📍 {{ layoutStore.userLocation.region }}, {{ layoutStore.userLocation.country }}</span>
+      </template>
+      <template v-else>
+        <span> Cargando... </span>
+      </template>
+    </div>
   </aside>
 </template>
 
@@ -24,8 +34,11 @@
  * @description A responsive navigation sidebar that displays links with icons.
  * It features a collapsibledesign and handles language translations for its items reactively.
  */
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useLayoutStore } from '@/stores/layout.store';
+
+const layoutStore = useLayoutStore();
 
 const { t, locale } = useI18n({ useScope: 'global' });
 
@@ -73,6 +86,10 @@ watch(locale, translateNavItems, { immediate: true });
 const getIconUrl = (name) => {
   return new URL(`../../assets/${name}.svg`, import.meta.url).href;
 };
+
+onMounted(() => {
+  layoutStore.fetchUserLocation();
+});
 </script>
 
 <style scoped>

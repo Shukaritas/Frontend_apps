@@ -67,18 +67,37 @@ import Toast from 'primevue/toast';
 import ConfirmDialog from 'primevue/confirmdialog';
 
 import { useUserProfileStore } from '../stores/user-profile.store';
+import { useAuthStore } from '@/stores/auth.store';
 
 const router = useRouter();
 const confirm = useConfirm();
 const toast = useToast();
 const { t } = useI18n({ useScope: 'global' });
 const userProfileStore = useUserProfileStore();
+const authStore = useAuthStore();
 
-const userId = 1;
 const preferences = reactive({ notifications: false, location: false });
 
 onMounted(() => {
-  userProfileStore.fetchProfile(userId);
+  const storeUserId = authStore?.user?.id;
+  let id = storeUserId;
+
+  if (!id) {
+    try {
+      const raw = localStorage.getItem('user');
+      const parsed = raw ? JSON.parse(raw) : null;
+      id = parsed?.id || null;
+    } catch (_) {
+      id = null;
+    }
+  }
+
+  if (!id) {
+    router.push('/login');
+    return;
+  }
+
+  userProfileStore.fetchProfile(id);
 });
 
 /**
@@ -91,7 +110,7 @@ const onUpdateProfile = async (data) => {
     if (result?.emailChanged) {
       toast.add({ severity: 'info', summary: 'Info', detail: t('toast.emailChangedReLogin') || 'Email changed. Please log in again.', life: 3500 });
       router.push('/login');
-      return; // evitar mostrar el toast de éxito estándar
+      return;
     }
     toast.add({ severity: 'success', summary: 'Success', detail: t('toast.profileUpdated'), life: 3000 });
   } catch (err) {
