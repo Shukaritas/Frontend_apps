@@ -40,6 +40,7 @@ import { useI18n } from 'vue-i18n';
 import { useLayoutStore } from '@/stores/layout.store';
 
 const layoutStore = useLayoutStore();
+const { t, locale } = useI18n({ useScope: 'global' });
 
 /**
  * Computed property que devuelve la ubicación formateada o un mensaje por defecto.
@@ -47,17 +48,15 @@ const layoutStore = useLayoutStore();
  */
 const locationDisplay = computed(() => {
   // Si la ubicación no es pública, mostrar cadena anónima
-  if (!layoutStore.isLocationPublic) return 'Ubicación Anónima';
+  if (!layoutStore.isLocationPublic) return t('sidebar.location.anonymous');
   // Si aún no se ha cargado la ubicación
-  if (!layoutStore.userLocation) return 'Cargando...';
+  if (!layoutStore.userLocation) return t('sidebar.location.loading');
   const { city, country_name } = layoutStore.userLocation;
   if (city && country_name) return `${city}, ${country_name}`;
   if (city) return city;
   if (country_name) return country_name;
-  return 'Ubicación desconocida';
+  return t('sidebar.location.unknown');
 });
-
-const { t, locale } = useI18n({ useScope: 'global' });
 
 /**
  * @const {Array<object>} baseNavItems

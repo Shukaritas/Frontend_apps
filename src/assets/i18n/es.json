@@ -7,7 +7,16 @@
     "due_date": "Fecha Limite",
     "actions": "Acciones",
     "recommendatios": "Ultimas Recomendaciones",
-    "empty": "Aún no hay contenido"
+    "empty": "Aún no hay contenido",
+    "errors": {
+      "unauthenticated": "Usuario no autenticado",
+      "loadFailed": "Error cargando datos del dashboard"
+    },
+    "emptySections": {
+      "fields": "Aún no tienes campos registrados",
+      "tasks": "No hay tareas próximas",
+      "recommendations": "No hay recomendaciones por ahora"
+    }
   },
 
   "sidebar": {
@@ -16,7 +25,12 @@
     "myFields": "Mis Campos",
     "myTasks": "Mis Tareas",
     "community": "Comunidad",
-    "myLocation": "Mi ubicación"
+    "myLocation": "Mi ubicación",
+    "location": {
+      "loading": "Cargando...",
+      "anonymous": "Ubicación Anónima",
+      "unknown": "Ubicación desconocida"
+    }
   },
   "header": {
     "profile": "Perfil",
@@ -113,6 +127,10 @@
       "fieldRequired": "El campo es requerido",
       "statusRequired": "El estado es requerido",
       "daysRequired": "Los días son requeridos"
+    },
+    "tooltip": {
+      "edit": "Editar cultivo",
+      "delete": "Eliminar cultivo"
     }
   },
   "registerCrop": {

@@ -7,7 +7,16 @@
     "due_date": "Due Date",
     "actions": "Actions",
     "recommendatios": "Lastest Recommendations",
-    "empty": "No content yet"
+    "empty": "No content yet",
+    "emptySections": {
+      "fields": "You have no fields yet",
+      "tasks": "No upcoming tasks",
+      "recommendations": "No recommendations yet"
+    },
+    "errors": {
+      "unauthenticated": "User not authenticated",
+      "loadFailed": "Error loading dashboard data"
+    }
   },
 
   "sidebar": {
@@ -16,7 +25,12 @@
     "myFields": "My Fields",
     "myTasks": "My Tasks",
     "community": "Community",
-    "myLocation": "My Location"
+    "myLocation": "My Location",
+    "location": {
+      "loading": "Loading...",
+      "anonymous": "Anonymous Location",
+      "unknown": "Unknown location"
+    }
   },
   "header": {
     "profile": "Profile",
@@ -113,6 +127,10 @@
       "fieldRequired": "Field is required",
       "statusRequired": "Status is required",
       "daysRequired": "Days are required"
+    },
+    "tooltip": {
+      "edit": "Edit crop",
+      "delete": "Delete crop"
     }
   },
   "registerCrop": {

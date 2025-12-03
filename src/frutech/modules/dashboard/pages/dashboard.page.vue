@@ -8,68 +8,77 @@
       <Message severity="error" :closable="false">{{ error }}</Message>
     </div>
 
-    <div v-else>
-      <div v-if="!userFields.length && !upcomingTasks.length && !recommendations.length" class="p-4">
-        <Message severity="info" :closable="false">{{ $t('dashboard.empty') }}</Message>
+    <div v-else class="grid gap-4">
+      <!-- Sección de campos -->
+      <div class="col-12">
+        <Card class="preview-fields-card">
+          <template #title>
+            <div class="flex justify-content-between align-items-center">
+              <h1 class="m-0">{{ $t('sidebar.dashboard') }}</h1>
+              <Button :label="$t('dashboard.addNewCrop')" icon="pi pi-plus" @click="goToMyFields" />
+            </div>
+          </template>
+          <template #content>
+            <div v-if="userFields.length === 0" class="p-3">
+              <Message severity="info" :closable="false">{{ $t('dashboard.emptySections.fields') }}</Message>
+            </div>
+            <div v-else class="field-items-container">
+              <div v-for="field in userFields" :key="field.id" class="field-item">
+                <img
+                  :src="field.imageUrl"
+                  :alt="field.name"
+                  class="field-image"
+                  @error="handleImageError"
+                >
+                <span class="field-title mt-2">{{ field.name }}</span>
+              </div>
+            </div>
+          </template>
+        </Card>
       </div>
-      <div v-else class="grid gap-4">
-        <div class="col-12">
-          <Card class="preview-fields-card">
-            <template #title>
-              <div class="flex justify-content-between align-items-center">
-                <h1 class="m-0">{{ $t('sidebar.dashboard') }}</h1>
-                <Button :label="$t('dashboard.addNewCrop')" icon="pi pi-plus" @click="goToMyFields" />
-              </div>
-            </template>
-            <template #content>
-              <div class="field-items-container">
-                <div v-for="field in userFields" :key="field.id" class="field-item">
-                  <img
-                    :src="field.imageUrl"
-                    :alt="field.name"
-                    class="field-image"
-                    @error="handleImageError"
-                  >
-                  <span class="field-title mt-2">{{ field.name }}</span>
-                </div>
-              </div>
-            </template>
-          </Card>
-        </div>
 
-        <div class="col-12">
-          <Card>
-            <template #title>
-              <div class="flex justify-content-between align-items-center">
-                <h2 class="m-0 text-xl font-semibold">{{ $t('sidebar.myTasks') }}</h2>
-                <Button :label="$t('dashboard.view_tasks')" @click="goToMyTasks" text />
-              </div>
-            </template>
-            <template #content>
-              <DataTable :value="upcomingTasks" responsiveLayout="scroll">
-                <Column field="field" :header="$t('dashboard.crop_name')"></Column>
-                <Column field="description" :header="$t('dashboard.task')"></Column>
-                <Column field="dueDate" :header="$t('dashboard.due_date')"></Column>
-                <Column :header="$t('dashboard.actions')">
-                  <template #body>
-                    <Checkbox :binary="true" />
-                  </template>
-                </Column>
-              </DataTable>
-            </template>
-          </Card>
-        </div>
+      <!-- Sección de tareas próximas -->
+      <div class="col-12">
+        <Card>
+          <template #title>
+            <div class="flex justify-content-between align-items-center">
+              <h2 class="m-0 text-xl font-semibold">{{ $t('sidebar.myTasks') }}</h2>
+              <Button :label="$t('dashboard.view_tasks')" @click="goToMyTasks" text />
+            </div>
+          </template>
+          <template #content>
+            <div v-if="upcomingTasks.length === 0" class="p-3">
+              <Message severity="info" :closable="false">{{ $t('dashboard.emptySections.tasks') }}</Message>
+            </div>
+            <DataTable v-else :value="upcomingTasks" responsiveLayout="scroll">
+              <Column field="field" :header="$t('dashboard.crop_name')"></Column>
+              <Column field="description" :header="$t('dashboard.task')"></Column>
+              <Column field="dueDate" :header="$t('dashboard.due_date')"></Column>
+              <Column :header="$t('dashboard.actions')">
+                <template #body>
+                  <Checkbox :binary="true" />
+                </template>
+              </Column>
+            </DataTable>
+          </template>
+        </Card>
+      </div>
 
-        <div class="col-12" v-if="recommendations.length">
-          <Card>
-            <template #title><h2 class="m-0 text-xl font-semibold">{{ $t('dashboard.recommendatios') }}</h2></template>
-            <template #content>
+      <!-- Sección de recomendaciones -->
+      <div class="col-12">
+        <Card>
+          <template #title><h2 class="m-0 text-xl font-semibold">{{ $t('dashboard.recommendatios') }}</h2></template>
+          <template #content>
+            <div v-if="recommendations.length === 0" class="p-3">
+              <Message severity="info" :closable="false">{{ $t('dashboard.emptySections.recommendations') }}</Message>
+            </div>
+            <div v-else>
               <div v-for="rec in recommendations" :key="rec.id" class="mb-3">
                 <p><strong class="font-semibold">{{ rec.title }}:</strong> {{ rec.content }}</p>
               </div>
-            </template>
-          </Card>
-        </div>
+            </div>
+          </template>
+        </Card>
       </div>
     </div>
   </div>
@@ -85,6 +94,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Checkbox from 'primevue/checkbox';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 import { FieldApiRepository } from '@/frutech/modules/my-fields/infrastructure/field.api-repository.js';
 import { TaskApiRepository } from '@/frutech/modules/my-tasks/infrastructure/task-api.repository.js';
@@ -92,6 +102,7 @@ import { TaskApiRepository } from '@/frutech/modules/my-tasks/infrastructure/tas
 const router = useRouter();
 const fieldRepository = new FieldApiRepository();
 const taskRepository = new TaskApiRepository();
+const { t } = useI18n();
 
 const isLoading = ref(false);
 const error = ref(null);
@@ -115,7 +126,7 @@ async function fetchDashboardData() {
 
   try {
     const userId = getCurrentUserId();
-    if (!userId) throw new Error('Usuario no autenticado');
+    if (!userId) throw new Error(t('dashboard.errors.unauthenticated'));
 
     // Cargar Fields del usuario
     const fields = await fieldRepository.getAll();
@@ -135,7 +146,7 @@ async function fetchDashboardData() {
     })) : [];
   } catch (e) {
     console.error(e);
-    error.value = e.message || 'Error cargando datos del dashboard';
+    error.value = e.message || t('dashboard.errors.loadFailed');
   } finally {
     isLoading.value = false;
   }

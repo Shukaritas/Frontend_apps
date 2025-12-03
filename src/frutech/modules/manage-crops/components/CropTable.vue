@@ -72,14 +72,14 @@
                 severity="warning" 
                 size="small" 
                 @click="$emit('edit', slotProps.data)"
-                v-tooltip.top="'Editar cultivo'"
+                v-tooltip.top="$t('manageCrops.tooltip.edit')"
               />
               <Button 
                 icon="pi pi-trash" 
                 severity="danger" 
                 size="small" 
                 @click="confirmDelete(slotProps.data)"
-                v-tooltip.top="'Eliminar cultivo'"
+                v-tooltip.top="$t('manageCrops.tooltip.delete')"
               />
             </div>
           </template>
