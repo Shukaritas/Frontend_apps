@@ -21,10 +21,24 @@ export const useLayoutStore = defineStore('layout', () => {
     const userLocation = ref(null);
 
     /**
+     * Controls whether user's location is public in UI.
+     * @type {import('vue').Ref<boolean>}
+     */
+    const isLocationPublic = ref(true);
+
+    /**
      * Toggles the visibility state of the sidebar.
      */
     function toggleSidebar() {
         isSidebarVisible.value = !isSidebarVisible.value;
+    }
+
+    /**
+     * Updates the location privacy flag.
+     * @param {boolean} value
+     */
+    function toggleLocationPrivacy(value) {
+        isLocationPublic.value = !!value;
     }
 
     /**
@@ -48,5 +62,5 @@ export const useLayoutStore = defineStore('layout', () => {
         }
     }
 
-    return { isSidebarVisible, toggleSidebar, userLocation, fetchUserLocation };
+    return { isSidebarVisible, toggleSidebar, userLocation, fetchUserLocation, isLocationPublic, toggleLocationPrivacy };
 });

@@ -43,9 +43,12 @@ const layoutStore = useLayoutStore();
 
 /**
  * Computed property que devuelve la ubicación formateada o un mensaje por defecto.
- * @returns {string} Cadena con formato "Ciudad, País" o "Ubicación desconocida"
+ * Respeta la privacidad del usuario.
  */
 const locationDisplay = computed(() => {
+  // Si la ubicación no es pública, mostrar cadena anónima
+  if (!layoutStore.isLocationPublic) return 'Ubicación Anónima';
+  // Si aún no se ha cargado la ubicación
   if (!layoutStore.userLocation) return 'Cargando...';
   const { city, country_name } = layoutStore.userLocation;
   if (city && country_name) return `${city}, ${country_name}`;

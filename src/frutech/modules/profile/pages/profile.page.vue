@@ -51,7 +51,7 @@
  * child components and communicates with the Pinia store for state management.
  * @author Estefano Solis
  */
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useConfirm } from "primevue/useconfirm";
@@ -68,6 +68,7 @@ import ConfirmDialog from 'primevue/confirmdialog';
 
 import { useUserProfileStore } from '../stores/user-profile.store';
 import { useAuthStore } from '@/stores/auth.store';
+import { useLayoutStore } from '@/stores/layout.store';
 
 const router = useRouter();
 const confirm = useConfirm();
@@ -75,6 +76,7 @@ const toast = useToast();
 const { t } = useI18n({ useScope: 'global' });
 const userProfileStore = useUserProfileStore();
 const authStore = useAuthStore();
+const layoutStore = useLayoutStore();
 
 const preferences = reactive({ notifications: false, location: false });
 
@@ -98,6 +100,14 @@ onMounted(() => {
   }
 
   userProfileStore.fetchProfile(id);
+
+  // Sincronizar el estado inicial del switch de ubicación con el store
+  preferences.location = !!layoutStore.isLocationPublic;
+});
+
+// Mantener el store sincronizado si el usuario cambia el toggle
+watch(() => preferences.location, (val) => {
+  layoutStore.toggleLocationPrivacy(val);
 });
 
 /**
