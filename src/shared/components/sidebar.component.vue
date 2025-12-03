@@ -36,10 +36,22 @@ import { useLayoutStore } from '@/stores/layout.store';
 
 const layoutStore = useLayoutStore();
 const { t, locale } = useI18n({ useScope: 'global' });
+<<<<<<< HEAD
 
 
 const locationDisplay = computed(() => {
   if (!layoutStore.isLocationPublic) return t('sidebar.location.anonymous');
+=======
+
+/**
+ * Computed property que devuelve la ubicación formateada o un mensaje por defecto.
+ * Respeta la privacidad del usuario.
+ */
+const locationDisplay = computed(() => {
+  // Si la ubicación no es pública, mostrar cadena anónima
+  if (!layoutStore.isLocationPublic) return t('sidebar.location.anonymous');
+  // Si aún no se ha cargado la ubicación
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
   if (!layoutStore.userLocation) return t('sidebar.location.loading');
   const { city, country_name } = layoutStore.userLocation;
   if (city && country_name) return `${city}, ${country_name}`;
@@ -48,7 +60,14 @@ const locationDisplay = computed(() => {
   return t('sidebar.location.unknown');
 });
 
+<<<<<<< HEAD
 
+=======
+/**
+ * @const {Array<object>} baseNavItems
+ * @description A static array of navigation item objects, each containing a translation key, icon name, and route.
+ */
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
 const baseNavItems = [
   { labelKey: 'sidebar.dashboard', icon: 'dashboard', route: '/dashboard' },
   { labelKey: 'sidebar.manageCrops', icon: 'manage-crops', route: '/manage-crops' },

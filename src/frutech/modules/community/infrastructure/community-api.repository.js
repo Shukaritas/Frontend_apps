@@ -4,6 +4,12 @@ import http from '@/services/http-common.js';
 
 const COMMUNITY_RECOMMENDATION_ENDPOINT = import.meta.env.VITE_ENDPOINT_COMMUNITY_RECOMMENDATION;
 
+<<<<<<< HEAD
+=======
+/**
+ *  CommunityRepository implementation using real HTTP API.
+ */
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
 export class CommunityApiRepository extends CommunityRepository {
   async getRecommendations() {
     const resp = await http.get(COMMUNITY_RECOMMENDATION_ENDPOINT);
@@ -49,7 +55,11 @@ export class CommunityApiRepository extends CommunityRepository {
     if (!id || !comment || comment.trim().length === 0) {
       throw new Error('ID y contenido del comentario son requeridos');
     }
+<<<<<<< HEAD
     const resp = await http.put(`${COMMUNITY_RECOMMENDATION_ENDPOINT}/${id}`, {
+=======
+    const resp = await http.patch(`${COMMUNITY_RECOMMENDATION_ENDPOINT}/${id}/content`, {
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
       comment: comment.trim()
     });
     const data = resp.data || {};

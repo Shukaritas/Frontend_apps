@@ -46,10 +46,21 @@ function isValidId(id) {
 }
 
 export class AuthApiRepository {
+<<<<<<< HEAD
   async login(credentials) {
     const endpoint = `${USERS_ENDPOINT}/sign-in`;
     const response = await http.post(endpoint, credentials);
     const data = response.data;
+=======
+  /**
+   * Realiza login contra API .NET 9.
+   * Endpoint: POST /api/v1/users/sign-in via baseURL /api
+   */
+  async login(email, password) {
+    try {
+      const resp = await http.post(`${USERS_ENDPOINT}/sign-in`, { email, password });
+      let data = resp?.data;
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
 
     const token = findJwtInObject(data);
     if (!token) throw new Error('Token no encontrado en la respuesta');
@@ -64,6 +75,7 @@ export class AuthApiRepository {
     return { user: new User(id, username, role), token };
   }
 
+<<<<<<< HEAD
   async register(userData) {
     const endpoint = `${USERS_ENDPOINT}/sign-up`;
     const response = await http.post(endpoint, userData);
@@ -80,5 +92,20 @@ export class AuthApiRepository {
     const role = getCI(claims, 'role') || 'USER';
 
     return { user: new User(id, username, role), token };
+=======
+  /**
+   * Registro de usuario.
+   * Endpoint: POST /api/v1/users/sign-up via baseURL /api
+   */
+  async register({ username, email, phoneNumber, identificator, password }) {
+    try {
+      if (!email || !password) throw new Error('Email y password son requeridos');
+      const payload = { userName: username, email, phoneNumber, identificator, password };
+      const response = await http.post(`${USERS_ENDPOINT}/sign-up`, payload);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.message || 'Error en el registro');
+    }
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
   }
 }

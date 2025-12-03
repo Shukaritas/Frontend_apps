@@ -4,10 +4,24 @@ import { UserProfile } from '../domain/models/user-profile.model';
 
 const USERS_ENDPOINT = import.meta.env.VITE_ENDPOINT_USERS;
 
+<<<<<<< HEAD
 
 export class UserProfileApiRepository extends UserProfileRepository {
     endpoint = USERS_ENDPOINT;
 
+=======
+/**
+ * @class UserProfileApiRepository
+ * @classdesc Implementación contra API .NET real.
+ * Endpoints utilizados (Swagger):
+ *  - GET    /api/v1/users/{id}
+ *  - PUT    /api/v1/users/{id}/profile
+ *  - PUT    /api/v1/users/{id}/password
+ *  - DELETE /api/v1/users/{id}
+ */
+export class UserProfileApiRepository extends UserProfileRepository {
+    endpoint = USERS_ENDPOINT;
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
 
     apiToDomain(api) {
         const id = api.id ?? api.Id;

@@ -4,6 +4,14 @@ import { Crop } from '../domain/models/crop.model';
 
 const CROP_FIELDS_ENDPOINT = import.meta.env.VITE_ENDPOINT_CROP_FIELDS;
 
+<<<<<<< HEAD
+=======
+/**
+ * Convierte fecha DD/MM/YYYY a formato ISO YYYY-MM-DD
+ * @param {string} dateStr - Fecha en formato DD/MM/YYYY
+ * @returns {string} Fecha en formato ISO YYYY-MM-DD
+ */
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
 function convertToISODate(dateStr) {
     if (!dateStr || typeof dateStr !== 'string') return '';
     if (dateStr.includes('-') && dateStr.length === 10) return dateStr;

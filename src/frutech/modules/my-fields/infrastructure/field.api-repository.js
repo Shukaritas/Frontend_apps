@@ -6,6 +6,14 @@ const FIELDS_ENDPOINT = import.meta.env.VITE_ENDPOINT_FIELDS;
 const PROGRESS_ENDPOINT = import.meta.env.VITE_ENDPOINT_PROGRESS;
 const TASKS_ENDPOINT = import.meta.env.VITE_ENDPOINT_TASKS;
 
+<<<<<<< HEAD
+=======
+/**
+ * Convierte fecha DD/MM/YYYY a formato ISO YYYY-MM-DD
+ * @param {string} dateStr - Fecha en formato DD/MM/YYYY o cualquier formato de fecha
+ * @returns {string|null} Fecha en formato ISO YYYY-MM-DD o null si es inválida
+ */
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
 function convertToISO(dateStr) {
   if (!dateStr || typeof dateStr !== 'string' || dateStr.trim() === '') {
     return null;
@@ -55,6 +63,10 @@ export class FieldApiRepository extends IFieldRepository {
       throw new Error('ID de usuario inválido');
     }
 
+<<<<<<< HEAD
+=======
+    // Único intento: endpoint correcto. Si falla se deja que el store maneje el error.
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
     const response = await http.get(`${FIELDS_ENDPOINT}/user/${userId}`);
     const data = Array.isArray(response.data) ? response.data : [];
     return FieldAssembler.toModels(data);
@@ -92,7 +104,11 @@ export class FieldApiRepository extends IFieldRepository {
       }
 
       const response = await http.post(FIELDS_ENDPOINT, formData, {
+<<<<<<< HEAD
         headers: { 'Content-Type': 'multipart/form-data' },
+=======
+        headers: { 'Content-Type': 'multipart/form-data' }
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
       });
       return FieldAssembler.toModel(response.data);
     } catch (error) {
@@ -100,10 +116,20 @@ export class FieldApiRepository extends IFieldRepository {
     }
   }
 
+<<<<<<< HEAD
   async addProgress(fieldId, progressData) {
     const isoDate = convertToISO(progressData.date);
     if (!isoDate) {
       throw new Error('Formato de fecha inválido. Use DD/MM/YYYY.');
+=======
+  async updateField(id, fieldData) {
+    try {
+      const payload = FieldAssembler.toPayload(fieldData);
+      const response = await http.put(`${FIELDS_ENDPOINT}/${id}`, payload);
+      return FieldAssembler.toModel(response.data);
+    } catch (error) {
+      throw new Error(error.message || 'Error actualizando campo');
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
     }
     const payload = {
       fieldId: parseInt(fieldId, 10),
@@ -115,8 +141,100 @@ export class FieldApiRepository extends IFieldRepository {
     return response.data;
   }
 
+<<<<<<< HEAD
   async getTasksForField(fieldId) {
     const response = await http.get(`${TASKS_ENDPOINT}/field/${fieldId}`);
     return response.data;
+=======
+  /**
+   * Actualiza el historial de progreso de un campo.
+   * @param {number} progressId - El ID del registro de progreso a actualizar
+   * @param {object} progressData - Datos del progreso que pueden incluir:
+   *   - watered: fecha en formato DD/MM/YYYY o booleano
+   *   - fertilized: fecha en formato DD/MM/YYYY o booleano
+   *   - pests: fecha en formato DD/MM/YYYY o booleano
+   * @returns {Promise<object>} - El registro de progreso actualizado
+   */
+  async updateProgress(progressId, progressData) {
+    try {
+      // El backend espera UpdateProgressHistoryResource con propiedades en PascalCase
+      // Las fechas deben estar en formato ISO (YYYY-MM-DD)
+      const payload = {};
+
+      // Convertir watered (puede ser fecha DD/MM/YYYY, fecha ISO, o booleano)
+      if (progressData.watered !== undefined && progressData.watered !== null) {
+        if (typeof progressData.watered === 'boolean') {
+          payload.Watered = progressData.watered;
+        } else if (typeof progressData.watered === 'string') {
+          const isoDate = convertToISO(progressData.watered);
+          payload.Watered = isoDate || progressData.watered;
+        } else {
+          payload.Watered = progressData.watered;
+        }
+      } else {
+        payload.Watered = false;
+      }
+
+      // Convertir fertilized
+      if (progressData.fertilized !== undefined && progressData.fertilized !== null) {
+        if (typeof progressData.fertilized === 'boolean') {
+          payload.Fertilized = progressData.fertilized;
+        } else if (typeof progressData.fertilized === 'string') {
+          const isoDate = convertToISO(progressData.fertilized);
+          payload.Fertilized = isoDate || progressData.fertilized;
+        } else {
+          payload.Fertilized = progressData.fertilized;
+        }
+      } else {
+        payload.Fertilized = false;
+      }
+
+      // Convertir pests
+      if (progressData.pests !== undefined && progressData.pests !== null) {
+        if (typeof progressData.pests === 'boolean') {
+          payload.Pests = progressData.pests;
+        } else if (typeof progressData.pests === 'string') {
+          const isoDate = convertToISO(progressData.pests);
+          payload.Pests = isoDate || progressData.pests;
+        } else {
+          payload.Pests = progressData.pests;
+        }
+      } else {
+        payload.Pests = false;
+      }
+
+      const response = await http.put(`${PROGRESS_ENDPOINT}/${progressId}`, payload);
+      return response.data;
+    } catch (error) {
+      const message = error?.response?.data?.message || error?.message || 'Error actualizando progreso';
+      throw new Error(message);
+    }
+  }
+
+  /**
+   * Crea una nueva tarea asociada a un campo.
+   * @param {object} taskPayload - Datos de la tarea:
+   *   - fieldId: ID del campo (number)
+   *   - description: Descripción de la tarea (string)
+   *   - dueDate: Fecha de vencimiento en formato ISO YYYY-MM-DD (string)
+   * @returns {Promise<object>} - La tarea creada
+   */
+  async addNewTask(taskPayload) {
+    try {
+      // El backend espera CreateTaskResource con propiedades en PascalCase
+      const payload = {
+        FieldId: Number(taskPayload.fieldId),
+        Description: taskPayload.description,
+        DueDate: taskPayload.dueDate // Debe estar en formato ISO
+      };
+
+      // Nota: http-common ya tiene baseURL='/api', por lo que '/Tasks' resulta en '/api/Tasks'
+      const response = await http.post(TASKS_ENDPOINT, payload);
+      return response.data;
+    } catch (error) {
+      const message = error?.response?.data?.message || error?.message || 'Error creando tarea';
+      throw new Error(message);
+    }
+>>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
   }
 }
