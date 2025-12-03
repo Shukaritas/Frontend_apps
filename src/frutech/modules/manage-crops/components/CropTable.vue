@@ -1,19 +1,16 @@
 <template>
   <div class="crop-table-container">
-    <!-- Loading State -->
     <div v-if="isLoading" class="loading-container">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
       <p>{{ $t('manageCrops.loadingCrops') }}</p>
     </div>
 
-    <!-- Error State -->
     <div v-else-if="error" class="error-container">
       <i class="pi pi-exclamation-triangle" style="font-size: 2rem; color: #e74c3c"></i>
       <p>{{ error }}</p>
       <Button @click="$emit('retry')" :label="$t('manageCrops.retry')" severity="secondary" />
     </div>
 
-    <!-- Table Content -->
     <div v-else>
       <DataTable 
         :value="crops" 
@@ -21,7 +18,7 @@
         :rows="10"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         :rowsPerPageOptions="[5,10,25]"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} cultivos"
+        :currentPageReportTemplate="$t('manageCrops.pagination')"
         responsiveLayout="scroll"
         class="p-datatable-sm"
       >
@@ -72,21 +69,20 @@
                 severity="warning" 
                 size="small" 
                 @click="$emit('edit', slotProps.data)"
-                v-tooltip.top="'Editar cultivo'"
+                v-tooltip.top="$t('manageCrops.tooltip.edit')"
               />
               <Button 
                 icon="pi pi-trash" 
                 severity="danger" 
                 size="small" 
                 @click="confirmDelete(slotProps.data)"
-                v-tooltip.top="'Eliminar cultivo'"
+                v-tooltip.top="$t('manageCrops.tooltip.delete')"
               />
             </div>
           </template>
         </Column>
       </DataTable>
 
-      <!-- Add New Crop Button -->
       <div class="add-crop-container">
         <Button 
           icon="pi pi-plus" 
@@ -97,8 +93,7 @@
       </div>
     </div>
 
-    <!-- Delete Confirmation Dialog -->
-    <Dialog 
+    <Dialog
       v-model:visible="deleteDialog" 
       :style="{width: '450px'}" 
       :header="$t('manageCrops.confirmDelete')" 
@@ -136,26 +131,20 @@ import Button from 'primevue/button';
 import Tag from 'primevue/tag';
 import Badge from 'primevue/badge';
 import Dialog from 'primevue/dialog';
-import { useConfirm } from 'primevue/useconfirm';
 
-// Helper para formatear fechas a DD/MM/YYYY o devolver YYYY-MM-DD si se requiere
 function formatDate(value, mode = 'DMY') {
   if (!value) return '';
   let datePart = String(value);
-  // Cortar tiempo si viene en ISO extendido
   if (datePart.includes('T')) datePart = datePart.split('T')[0];
-  // Si viene en YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
     const [y, m, d] = datePart.split('-');
     return mode === 'DMY' ? `${d}/${m}/${y}` : `${y}-${m}-${d}`;
   }
-  // Si viene en DD/MM/YYYY
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(datePart)) {
     if (mode === 'DMY') return datePart;
     const [d, m, y] = datePart.split('/');
     return `${y}-${m}-${d}`;
   }
-  // Intento genérico de parseo
   try {
     const d = new Date(datePart);
     if (!isNaN(d.getTime())) {
@@ -165,7 +154,7 @@ function formatDate(value, mode = 'DMY') {
       return mode === 'DMY' ? `${dd}/${mm}/${yy}` : `${yy}-${mm}-${dd}`;
     }
   } catch {}
-  return datePart; // fallback
+  return datePart;
 }
 
 const props = defineProps({

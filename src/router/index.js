@@ -1,7 +1,3 @@
-/**
- * @file Vue Router configuration.
- * @description Configuración de rutas con redirección inicial al Login.
- */
 
 import { createRouter, createWebHistory } from 'vue-router';
 import MainLayout from '../shared/layouts/main-layout.component.vue';
@@ -78,7 +74,6 @@ const routes = [
             },
         ],
     },
-    // Redirigir cualquier ruta desconocida al login
     { path: '/:pathMatch(.*)*', redirect: '/login' }
 ];
 
@@ -94,7 +89,6 @@ router.beforeEach((to, from, next) => {
     const isAuthenticated = authStore.isAuthenticated;
 
     if (!isPublic && !isAuthenticated) {
-        // CAMBIO: Redirigir al Login si no está autenticado
         return next({ path: '/login' });
     }
 

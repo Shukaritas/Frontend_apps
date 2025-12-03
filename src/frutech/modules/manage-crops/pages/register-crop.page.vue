@@ -112,13 +112,12 @@ onMounted(async () => {
   try {
     await fieldStore.fetchFields();
     previewFieldsWithStatus.value = (fieldStore.fields || []).map(f => {
-      const rawCropName = f.cropName || f.crop || ''; // diferentes fuentes
+      const rawCropName = f.cropName || f.crop || '';
       const hasCrop = rawCropName && rawCropName.trim() !== '' && rawCropName !== 'Sin Cultivo' && rawCropName !== '—';
       return {
         id: f.id,
         title: f.name,
         image_url: f.imageUrl,
-        // Solo asignar el status si realmente hay un cultivo activo
         status: hasCrop ? f.status : null,
         crop: hasCrop ? rawCropName : '—',
         days: '0'
@@ -209,7 +208,6 @@ async function save() {
     };
     await cropStore.createCrop(cropPayload);
     toast.add({ severity: 'success', summary: 'Éxito', detail: 'Cultivo creado correctamente.', life: 2000 });
-    // Redirigir inmediatamente sin intentar actualizar el campo (evita 405 en backend real)
     router.push({ name: 'ManageCrops' });
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Error', detail: `No se pudo crear el registro del cultivo: ${e.message}`, life: 4000 });

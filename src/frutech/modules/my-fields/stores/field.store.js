@@ -4,22 +4,15 @@ import { FieldApiRepository } from '../infrastructure/field.api-repository.js';
 import { useDashboardStore } from '@/frutech/modules/dashboard/stores/dashboard.store.js';
 import { useAuthStore } from '@/stores/auth.store.js';
 
-/**
- * Convierte fecha DD/MM a formato ISO YYYY-MM-DD usando el año actual
- * @param {string} dateStr - Fecha en formato DD/MM
- * @returns {string} Fecha en formato ISO YYYY-MM-DD
- */
 function convertShortDateToISO(dateStr) {
   if (!dateStr || typeof dateStr !== 'string') {
-    return new Date().toISOString().split('T')[0]; // Fecha actual como fallback
+    return new Date().toISOString().split('T')[0];
   }
 
-  // Si ya está en formato ISO, retornar
   if (/^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
     return dateStr.split('T')[0];
   }
 
-  // Parsear DD/MM y agregar año actual
   const parts = dateStr.split('/');
   if (parts.length === 2) {
     const [day, month] = parts;
@@ -29,7 +22,6 @@ function convertShortDateToISO(dateStr) {
     }
   }
 
-  // Si tiene 3 partes (DD/MM/YYYY), convertir normalmente
   if (parts.length === 3) {
     const [day, month, year] = parts;
     if (day && month && year && !isNaN(day) && !isNaN(month) && !isNaN(year)) {
@@ -37,7 +29,6 @@ function convertShortDateToISO(dateStr) {
     }
   }
 
-  // Fallback: fecha actual
   return new Date().toISOString().split('T')[0];
 }
 
@@ -59,7 +50,7 @@ export const useFieldStore = defineStore('fields', () => {
     } catch (e) {
       error.value = 'No se pudieron cargar los campos.';
       console.error(e);
-      fields.value = []; // limpiar lista para evitar estados inconsistentes
+      fields.value = [];
     } finally {
       isLoading.value = false;
     }
@@ -67,14 +58,14 @@ export const useFieldStore = defineStore('fields', () => {
   async function fetchFieldById(id) {
     isLoading.value = true;
     error.value = null;
-    currentField.value = null; // asegurar estado limpio antes
+    currentField.value = null;
     try {
       currentField.value = await fieldRepository.getById(id);
       if (!currentField.value) throw new Error('Campo no encontrado');
     } catch (e) {
       error.value = 'No se pudo cargar la información del campo.';
       console.error(e);
-      currentField.value = null; // aseguramos nulidad en error
+      currentField.value = null;
     } finally {
       isLoading.value = false;
     }
@@ -99,41 +90,24 @@ export const useFieldStore = defineStore('fields', () => {
 
       const dashboardStore = useDashboardStore();
       dashboardStore.fetchDashboardData();
+
     } catch (e) {
-      error.value = 'No se pudo guardar el campo.';
+      error.value = 'No se pudo crear el campo.';
       console.error(e);
       throw e;
     } finally {
       isLoading.value = false;
     }
   }
-  async function updateFieldProgress(fieldId, newProgress) {
+
+  async function updateFieldProgress(fieldId, progressData) {
     isLoading.value = true;
     error.value = null;
     try {
-      // Verificar que tenemos el campo actual cargado
-      if (!currentField.value || currentField.value.id !== fieldId) {
-        await fetchFieldById(fieldId);
-      }
-
-      // Obtener el ID del registro de progreso más reciente
-      const progressHistoryId = currentField.value.progressHistoryId;
-
-      if (!progressHistoryId) {
-        throw new Error('No se encontró un registro de progreso para actualizar');
-      }
-
-      // Usar el endpoint correcto: PUT /v1/progress/{id}
-      await fieldRepository.updateProgress(progressHistoryId, {
-        watered: newProgress.watered ?? false,
-        fertilized: newProgress.fertilized ?? false,
-        pests: newProgress.pests ?? false
-      });
-
-      // Recargar el campo completo desde el servidor para obtener los datos actualizados
+      await fieldRepository.addProgress(fieldId, progressData);
       await fetchFieldById(fieldId);
     } catch (e) {
-      error.value = 'No se pudo actualizar el progreso del campo.';
+      error.value = 'No se pudo actualizar el progreso.';
       console.error(e);
       throw e;
     } finally {
@@ -145,59 +119,15 @@ export const useFieldStore = defineStore('fields', () => {
     isLoading.value = true;
     error.value = null;
     try {
-      // Convertir fecha DD/MM a formato ISO YYYY-MM-DD
-      const isoDate = convertShortDateToISO(taskData.date);
-
-      // Preparar payload según CreateTaskResource del backend
       const payload = {
+        ...taskData,
+        dueDate: convertShortDateToISO(taskData.date),
         fieldId: fieldId,
-        description: taskData.task,
-        dueDate: isoDate
       };
-
-      // Crear la tarea en el backend
-      const newTaskFromBackend = await fieldRepository.addNewTask(payload);
-
-      // Actualizar el estado local agregando la nueva tarea
-      if (currentField.value) {
-        const currentTasks = currentField.value.tasks || [];
-
-        // Transformar la respuesta del backend al formato que usa la vista
-        const newTaskForView = {
-          id: newTaskFromBackend.id ?? newTaskFromBackend.Id,
-          description: newTaskFromBackend.description ?? newTaskFromBackend.Description,
-          dueDate: newTaskFromBackend.dueDate ?? newTaskFromBackend.DueDate,
-          date: taskData.date, // Mantener formato original para la vista
-          completed: newTaskFromBackend.completed ?? newTaskFromBackend.Completed ?? false,
-          name: taskData.name,
-          task: taskData.task
-        };
-
-        // Actualizar el estado local sin hacer otra petición al servidor
-        currentField.value = {
-          ...currentField.value,
-          tasks: [...currentTasks, newTaskForView]
-        };
-      }
+      await fieldRepository.addTask(payload);
+      await fetchFieldById(fieldId);
     } catch (e) {
       error.value = 'No se pudo agregar la tarea.';
-      console.error(e);
-      throw e;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function updateFieldCropInfo(fieldId, cropData) {
-    isLoading.value = true;
-    error.value = null;
-    try {
-      await fieldRepository.updateField(fieldId, cropData);
-      if (currentField.value && currentField.value.id === fieldId) {
-        currentField.value = { ...currentField.value, ...cropData };
-      }
-    } catch (e) {
-      error.value = 'No se pudo actualizar la información del cultivo en el campo.';
       console.error(e);
       throw e;
     } finally {
@@ -215,6 +145,5 @@ export const useFieldStore = defineStore('fields', () => {
     createField,
     updateFieldProgress,
     addTaskToField,
-    updateFieldCropInfo
   };
 });

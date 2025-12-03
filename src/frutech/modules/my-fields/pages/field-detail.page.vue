@@ -170,7 +170,6 @@ const saveProgress = async () => {
 };
 
 const saveTask = async () => {
-  // Validar que la descripción tenga al menos 3 caracteres
   if (!newTaskData.task || newTaskData.task.trim().length < 3) {
     toast.add({
       severity: 'warn',
@@ -212,7 +211,6 @@ const confirmDeleteTask = (task) => {
     accept: async () => {
       try {
         await taskStore.deleteTask(task.id);
-        // Re-fetch the field data to get the updated task list
         await fieldStore.fetchFieldById(route.params.id);
         toast.add({ severity: 'info', summary: 'Confirmado', detail: 'Tarea eliminada', life: 3000 });
       } catch (error) {
@@ -228,7 +226,6 @@ onMounted(() => {
   fieldStore.fetchFieldById(fieldId);
 });
 
-// Manejo de error de carga de imagen (fallback a placeholder)
 const handleImageError = (event) => {
   event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
 };

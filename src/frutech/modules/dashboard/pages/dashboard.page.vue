@@ -18,7 +18,10 @@
             </div>
           </template>
           <template #content>
-            <div class="field-items-container">
+            <div v-if="userFields.length === 0" class="p-3">
+              <Message severity="info" :closable="false">{{ $t('dashboard.emptySections.fields') }}</Message>
+            </div>
+            <div v-else class="field-items-container">
               <div v-for="field in userFields" :key="field.id" class="field-item">
                 <img
                   :src="field.imageUrl"
@@ -42,7 +45,10 @@
             </div>
           </template>
           <template #content>
-            <DataTable :value="upcomingTasks" responsiveLayout="scroll">
+            <div v-if="upcomingTasks.length === 0" class="p-3">
+              <Message severity="info" :closable="false">{{ $t('dashboard.emptySections.tasks') }}</Message>
+            </div>
+            <DataTable v-else :value="upcomingTasks" responsiveLayout="scroll">
               <Column field="field" :header="$t('dashboard.crop_name')"></Column>
               <Column field="description" :header="$t('dashboard.task')"></Column>
               <Column field="dueDate" :header="$t('dashboard.due_date')"></Column>
@@ -56,13 +62,17 @@
         </Card>
       </div>
 
-      <!-- Recomendaciones mantiene la estructura original si existe otra fuente de datos -->
-      <div class="col-12" v-if="recommendations.length">
+      <div class="col-12">
         <Card>
           <template #title><h2 class="m-0 text-xl font-semibold">{{ $t('dashboard.recommendatios') }}</h2></template>
           <template #content>
-            <div v-for="rec in recommendations" :key="rec.id" class="mb-3">
-              <p><strong class="font-semibold">{{ rec.title }}:</strong> {{ rec.content }}</p>
+            <div v-if="recommendations.length === 0" class="p-3">
+              <Message severity="info" :closable="false">{{ $t('dashboard.emptySections.recommendations') }}</Message>
+            </div>
+            <div v-else>
+              <div v-for="rec in recommendations" :key="rec.id" class="mb-3">
+                <p><strong class="font-semibold">{{ rec.title }}:</strong> {{ rec.content }}</p>
+              </div>
             </div>
           </template>
         </Card>
@@ -81,6 +91,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Checkbox from 'primevue/checkbox';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 import { FieldApiRepository } from '@/frutech/modules/my-fields/infrastructure/field.api-repository.js';
 import { TaskApiRepository } from '@/frutech/modules/my-tasks/infrastructure/task-api.repository.js';
@@ -88,13 +99,14 @@ import { TaskApiRepository } from '@/frutech/modules/my-tasks/infrastructure/tas
 const router = useRouter();
 const fieldRepository = new FieldApiRepository();
 const taskRepository = new TaskApiRepository();
+const { t } = useI18n();
 
 const isLoading = ref(false);
 const error = ref(null);
 
 const userFields = ref([]);
 const upcomingTasks = ref([]);
-const recommendations = ref([]); // placeholder si luego hay recomendaciones reales
+const recommendations = ref([]);
 
 function getCurrentUserId() {
   try {
@@ -111,27 +123,24 @@ async function fetchDashboardData() {
 
   try {
     const userId = getCurrentUserId();
-    if (!userId) throw new Error('Usuario no autenticado');
+    if (!userId) throw new Error(t('dashboard.errors.unauthenticated'));
 
-    // Cargar Fields del usuario
     const fields = await fieldRepository.getAll();
     userFields.value = Array.isArray(fields)
       ? fields.map(f => ({ id: f.id, name: f.name, imageUrl: f.imageUrl }))
       : [];
 
-    // Cargar 3 tareas próximas del usuario
     const tasks = await taskRepository.getUpcomingTasks(userId, 3);
     upcomingTasks.value = Array.isArray(tasks) ? tasks.map(t => ({
       id: t.id,
       description: t.description,
-      // TaskApiRepository ya convierte dueDate a DD/MM vía apiToDomain
       dueDate: t.dueDate,
       field: t.field,
       completed: t.completed
     })) : [];
   } catch (e) {
     console.error(e);
-    error.value = e.message || 'Error cargando datos del dashboard';
+    error.value = e.message || t('dashboard.errors.loadFailed');
   } finally {
     isLoading.value = false;
   }
@@ -149,7 +158,6 @@ const goToMyTasks = () => {
   router.push('/my-tasks');
 };
 
-// Manejo de error de carga de imagen (fallback a placeholder)
 const handleImageError = (event) => {
   event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
 };
@@ -170,16 +178,15 @@ const handleImageError = (event) => {
   display: flex;
   gap: 1.5rem;
   overflow-x: auto;
-  padding-bottom: 1rem; /* Espacio para la barra de scroll */
+  padding-bottom: 1rem;
 }
 
-/* Ocultar barra de scroll pero mantener funcionalidad */
 .field-items-container::-webkit-scrollbar {
   display: none;
 }
 .field-items-container {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .field-item {

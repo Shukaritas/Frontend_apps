@@ -1,6 +1,3 @@
-/**
- * Routes configuration for the Community Module.
- */
 export const communityRoutes = [
   {
     path: '/community',

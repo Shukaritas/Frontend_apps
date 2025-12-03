@@ -6,7 +6,17 @@
     "task": "Tarea",
     "due_date": "Fecha Limite",
     "actions": "Acciones",
-    "recommendatios": "Ultimas Recomendaciones"
+    "recommendatios": "Ultimas Recomendaciones",
+    "empty": "Aún no hay contenido",
+    "errors": {
+      "unauthenticated": "Usuario no autenticado",
+      "loadFailed": "Error cargando datos del dashboard"
+    },
+    "emptySections": {
+      "fields": "Aún no tienes campos registrados",
+      "tasks": "No hay tareas próximas",
+      "recommendations": "No hay recomendaciones por ahora"
+    }
   },
 
   "sidebar": {
@@ -14,7 +24,13 @@
     "manageCrops": "Gestionar Cultivos",
     "myFields": "Mis Campos",
     "myTasks": "Mis Tareas",
-    "community": "Comunidad"
+    "community": "Comunidad",
+    "myLocation": "Mi ubicación",
+    "location": {
+      "loading": "Cargando...",
+      "anonymous": "Ubicación Anónima",
+      "unknown": "Ubicación desconocida"
+    }
   },
   "header": {
     "profile": "Perfil",
@@ -103,6 +119,7 @@
     "errorUpdateCrop": "No se pudo actualizar el cultivo",
     "errorDeleteCrop": "No se pudo eliminar el cultivo",
     "errorLoadCrops": "No se pudieron cargar los cultivos",
+    "pagination": "Mostrando {first} a {last} de {totalRecords} cultivos",
     "validation": {
       "cropNameRequired": "El nombre del cultivo es requerido",
       "plantingDateRequired": "La fecha de siembra es requerida",
@@ -110,6 +127,10 @@
       "fieldRequired": "El campo es requerido",
       "statusRequired": "El estado es requerido",
       "daysRequired": "Los días son requeridos"
+    },
+    "tooltip": {
+      "edit": "Editar cultivo",
+      "delete": "Eliminar cultivo"
     }
   },
   "registerCrop": {
@@ -172,6 +193,63 @@
   "community": {
     "title": "Lo que dice nuestra comunidad",
     "description": "Retroalimentacion de nuestros usuarios que se unieron al flujo de la aplicacion. Unete a miles de uusarios satisfechos en todo el mundo",
-    "quantity": "Comentarios"
+    "quantity": "Comentarios",
+    "actions": {
+      "addComment": "Agregar comentario",
+      "newComment": "Nuevo comentario",
+      "editComment": "Editar comentario",
+      "commentLabel": "Comentario",
+      "commentPlaceholder": "Escribe tu comentario...",
+      "commentRequired": "El comentario es requerido",
+      "cancel": "Cancelar",
+      "update": "Actualizar",
+      "post": "Publicar"
+    },
+    "toasts": {
+      "updated": "Comentario actualizado",
+      "posted": "Comentario publicado",
+      "error": "Error"
+    }
+  },
+  "myTasks": {
+    "title": "Mis Tareas",
+    "total": "Total de Tareas",
+    "empty": "No se encontraron tareas.",
+    "toasts": {
+      "updated": "Tarea actualizada correctamente.",
+      "created": "Tarea creada.",
+      "saveError": "No se pudo guardar la tarea.",
+      "success": "Éxito",
+      "error": "Error"
+    }
+  },
+  "iam": {
+    "login": {
+      "title": "Iniciar sesión",
+      "email": "Email",
+      "emailPlaceholder": "ejemplo@correo.com",
+      "password": "Contraseña",
+      "submit": "Iniciar sesión",
+      "loading": "Cargando...",
+      "noAccount": "¿No tienes cuenta?",
+      "goRegister": "Regístrate"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "fullName": "Nombre Completo",
+      "fullNamePlaceholder": "Juan Perez",
+      "dni": "DNI (8 dígitos)",
+      "dniPlaceholder": "12345678",
+      "phone": "Teléfono (con código de país)",
+      "phonePlaceholder": "+51999999999",
+      "email": "Email",
+      "emailPlaceholder": "ejemplo@correo.com",
+      "password": "Contraseña",
+      "submit": "Crear cuenta",
+      "loading": "Registrando...",
+      "haveAccount": "¿Ya tienes cuenta?",
+      "goLogin": "Inicia sesión",
+      "success": "¡Cuenta creada con éxito! Redirigiendo al login..."
+    }
   }
 }

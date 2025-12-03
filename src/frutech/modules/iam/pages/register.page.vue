@@ -1,48 +1,48 @@
 <template>
   <main class="auth-container">
     <section class="auth-card">
-      <h1>Crear cuenta</h1>
+      <h1>{{ $t('iam.register.title') }}</h1>
 
       <form @submit.prevent="handleRegister" class="auth-form">
         <label>
-          <span>Nombre Completo</span>
-          <input v-model="form.username" type="text" required placeholder="Juan Perez" />
+          <span>{{ $t('iam.register.fullName') }}</span>
+          <input v-model="form.username" type="text" required :placeholder="$t('iam.register.fullNamePlaceholder')" />
         </label>
 
         <label>
-          <span>DNI (8 dígitos)</span>
+          <span>{{ $t('iam.register.dni') }}</span>
           <input
               v-model="form.identificator"
               type="text"
               maxlength="8"
               required
-              placeholder="12345678"
+              :placeholder="$t('iam.register.dniPlaceholder')"
               @input="validateNumberInput"
           />
         </label>
 
         <label>
-          <span>Teléfono (con código de país)</span>
-          <input v-model="form.phoneNumber" type="text" required placeholder="+51999999999" />
+          <span>{{ $t('iam.register.phone') }}</span>
+          <input v-model="form.phoneNumber" type="text" required :placeholder="$t('iam.register.phonePlaceholder')" />
         </label>
 
         <label>
-          <span>Email</span>
-          <input v-model="form.email" type="email" required placeholder="ejemplo@correo.com"/>
+          <span>{{ $t('iam.register.email') }}</span>
+          <input v-model="form.email" type="email" required :placeholder="$t('iam.register.emailPlaceholder')"/>
         </label>
 
         <label>
-          <span>Contraseña</span>
+          <span>{{ $t('iam.register.password') }}</span>
           <input v-model="form.password" type="password" required />
         </label>
 
         <button type="submit" :disabled="loading">
-          {{ loading ? 'Registrando...' : 'Crear cuenta' }}
+          {{ loading ? $t('iam.register.loading') : $t('iam.register.submit') }}
         </button>
 
         <p class="alt-action">
-          ¿Ya tienes cuenta?
-          <router-link to="/login">Inicia sesión</router-link>
+          {{ $t('iam.register.haveAccount') }}
+          <router-link to="/login">{{ $t('iam.register.goLogin') }}</router-link>
         </p>
       </form>
 
@@ -60,6 +60,9 @@
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n({ useScope: 'global' });
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -75,23 +78,20 @@ const form = reactive({
   password: ''
 });
 
-// Validación simple en tiempo real para que solo ingresen números en el DNI
 const validateNumberInput = (event) => {
   form.identificator = event.target.value.replace(/\D/g, '');
 };
 
 const handleRegister = async () => {
-  authStore.error = null; // Limpiar errores previos
+  authStore.error = null;
   loading.value = true;
 
-  // Nota: La validación estricta (DNI 8 digitos, + en teléfono)
-  // se realiza dentro de la entidad User en el Store/Modelo antes de enviar.
 
   const success = await authStore.register(form);
   loading.value = false;
 
   if (success) {
-    successMessage.value = '¡Cuenta creada con éxito! Redirigiendo al login...';
+    successMessage.value = t('iam.register.success');
     setTimeout(() => {
       router.push('/login');
     }, 1500);
@@ -100,7 +100,6 @@ const handleRegister = async () => {
 </script>
 
 <style scoped>
-/* Estilos copiados y encapsulados del Landing Page para mantener la identidad visual */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
 .auth-container {

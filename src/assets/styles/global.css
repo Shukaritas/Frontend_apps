@@ -1,18 +1,4 @@
-/* src/assets/styles/global.css */
 
-/*
-  Asegúrate de que este archivo se importa DESPUÉS de los estilos de PrimeVue y Aura
-  en main.js para que las sobreescrituras funcionen.
-*/
-
-/* ------------------------------------------- */
-/* 1. Variables Globales (Aura Theme Overrides) */
-/* ------------------------------------------- */
-/*
-  Las variables de Aura (o cualquier tema de PrimeVue) están definidas con un prefijo 'p'
-  (ej. --p-primary-500). Puedes encontrarlas en la documentación o inspeccionando elementos.
-  Aquí sobrescribimos las que se acercan más a tu imagen.
-*/
 :root {
     --p-primary-500: #a8bfa8;
     --p-primary-50: #E6EFE3;

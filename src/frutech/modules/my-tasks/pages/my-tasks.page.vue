@@ -3,9 +3,9 @@
     <Card>
       <template #title>
         <div class="header-section">
-          <h1 class="m-0">{{ $t('sidebar.myTasks') }}</h1>
+          <h1 class="m-0">{{ $t('myTasks.title') }}</h1>
           <div class="total-tasks">
-            <span class="label">Total Tasks</span>
+            <span class="label">{{ $t('myTasks.total') }}</span>
             <span class="count">{{ taskStore.taskCount }}</span>
           </div>
         </div>
@@ -50,14 +50,9 @@ import TaskForm from '../presentation/views/task-form.component.vue';
 import DeleteTaskDialog from '../presentation/views/delete-task-dialog.component.vue';
 import {useToast} from "primevue/usetoast";
 import Toast from 'primevue/toast';
+import { useI18n } from 'vue-i18n';
 
-
-/**
- * MyTasks Page Component
- * This component serves as the main page for managing user tasks.
- * It integrates the TaskList, TaskForm, and DeleteTaskDialog components,
- * and interacts with the TaskStore for state management.
- */
+const { t } = useI18n({ useScope: 'global' });
 
 const taskStore = useTaskStore();
 const toast = useToast();
@@ -94,13 +89,13 @@ const handleSaveTask = async (taskData) => {
   try {
     if (selectedTask.value && selectedTask.value.id) {
       await taskStore.updateTask(selectedTask.value.id, taskData);
-      toast.add({ severity: 'success', summary: 'Éxito', detail: 'Tarea actualizada correctamente.', life: 3000 });
+      toast.add({ severity: 'success', summary: t('myTasks.toasts.success'), detail: t('myTasks.toasts.updated'), life: 3000 });
     } else {
       await taskStore.createTask(taskData);
-      toast.add({ severity: 'success', summary: 'Éxito', detail: 'Tarea creada.', life: 3000 });
+      toast.add({ severity: 'success', summary: t('myTasks.toasts.success'), detail: t('myTasks.toasts.created'), life: 3000 });
     }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar la tarea.', life: 3000 });
+    toast.add({ severity: 'error', summary: t('myTasks.toasts.error'), detail: t('myTasks.toasts.saveError'), life: 3000 });
   } finally {
     handleCancelDialog();
   }

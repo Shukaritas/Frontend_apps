@@ -44,14 +44,8 @@
 </template>
 
 <script setup>
-/**
- * @file Profile Page Component
- * @description This page serves as the main user profile interface, allowing users to view and edit
- * their personal information, change their password, and manage account settings. It orchestrates
- * child components and communicates with the Pinia store for state management.
- * @author Estefano Solis
- */
-import { onMounted, reactive } from 'vue';
+
+import { onMounted, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useConfirm } from "primevue/useconfirm";
@@ -68,6 +62,7 @@ import ConfirmDialog from 'primevue/confirmdialog';
 
 import { useUserProfileStore } from '../stores/user-profile.store';
 import { useAuthStore } from '@/stores/auth.store';
+import { useLayoutStore } from '@/stores/layout.store';
 
 const router = useRouter();
 const confirm = useConfirm();
@@ -75,6 +70,7 @@ const toast = useToast();
 const { t } = useI18n({ useScope: 'global' });
 const userProfileStore = useUserProfileStore();
 const authStore = useAuthStore();
+const layoutStore = useLayoutStore();
 
 const preferences = reactive({ notifications: false, location: false });
 
@@ -98,12 +94,15 @@ onMounted(() => {
   }
 
   userProfileStore.fetchProfile(id);
+
+  preferences.location = !!layoutStore.isLocationPublic;
 });
 
-/**
- * Handles the profile update event from the child component.
- * @param {object} data - The profile data to update.
- */
+watch(() => preferences.location, (val) => {
+  layoutStore.toggleLocationPrivacy(val);
+});
+
+
 const onUpdateProfile = async (data) => {
   try {
     const result = await userProfileStore.updateProfile(data);
@@ -118,10 +117,7 @@ const onUpdateProfile = async (data) => {
   }
 };
 
-/**
- * Handles the password change event from the child component.
- * @param {object} data - The password data.
- */
+
 const onChangePassword = async (data) => {
   try {
     await userProfileStore.changePassword(data);
@@ -131,17 +127,13 @@ const onChangePassword = async (data) => {
   }
 };
 
-/**
- * Logs out the user and redirects to the login page.
- */
+
 const logout = () => {
   toast.add({ severity: 'info', summary: 'Info', detail: 'Logging out...', life: 1500 });
   router.push('/login');
 };
 
-/**
- * Displays a confirmation dialog before deleting the user's account.
- */
+
 const confirmDelete = () => {
   confirm.require({
     group: 'danger',

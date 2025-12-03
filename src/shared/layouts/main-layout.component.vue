@@ -18,18 +18,11 @@
 </template>
 
 <script setup>
-/**
- * @file Main Layout Component
- * @description This component defines the primary application layout, including the sidebar,
- * header, and main content area. It controls the responsive behavior of the sidebar.
- */
+
 import { useLayoutStore } from '@/stores/layout.store';
 import Sidebar from '../components/sidebar.component.vue';
 import Header from '../components/header.component.vue';
 
-/**
- * @const {object} layoutStore
- * @description Instance of the Pinia store that manages layout state, such as sidebar visibility.
- */
+
 const layoutStore = useLayoutStore();
 </script>

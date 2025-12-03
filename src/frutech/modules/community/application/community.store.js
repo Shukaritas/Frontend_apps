@@ -3,12 +3,6 @@ import { CommunityApiRepository } from '../infrastructure/community-api.reposito
 import { CommunityRecommendationAssembler } from './community-recommendation.assembler.js';
 import { useAuthStore } from '@/stores/auth.store.js';
 
-/**
- * Pinia store for managing community recommendations.
- * This store handles state, getters, and actions related to community recommendations.
- * It interacts with the CommunityApiRepository to fetch data and uses the CommunityRecommendationAssembler
- * to convert entities to DTOs for use in the application.
- */
 export const useCommunityStore = defineStore('community', {
   state: () => ({
     recommendations: [],
@@ -77,11 +71,6 @@ export const useCommunityStore = defineStore('community', {
         throw error;
       }
     },
-    /**
-     * Edita el contenido de un comentario existente.
-     * @param {number} commentId - ID del comentario a editar
-     * @param {string} newContent - Nuevo contenido del comentario
-     */
     async editComment(commentId, newContent) {
       this.error = null;
       try {

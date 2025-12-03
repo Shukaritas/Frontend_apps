@@ -3,26 +3,18 @@ import { DashboardData } from '../domain/models/dashboard.model';
 import { FieldApiRepository } from '@/frutech/modules/my-fields/infrastructure/field.api-repository.js';
 import { TaskApiRepository } from '@/frutech/modules/my-tasks/infrastructure/task-api.repository.js';
 
-// Recomendaciones estáticas (se evita consumo API real para Community)
 const STATIC_RECOMMENDATIONS = [
   { id: 1, user: 'AgroExpert', role: 'Especialista', description: 'Optimiza riego temprano para mejorar retención de nutrientes.' },
   { id: 2, user: 'SoilGuru', role: 'Analista Suelos', description: 'Añade compost orgánico en parcelas con menor humedad.' },
   { id: 3, user: 'CropTech', role: 'Tecnólogo', description: 'Considera sensores de humedad en campos con variabilidad extrema.' }
 ];
 
-
-/**
- * @class DashboardApiRepository
- * @classdesc Implementación del repositorio que interactúa con la API REST para obtener los datos del dashboard.
- * @extends DashboardRepository
- */
 export class DashboardApiRepository extends DashboardRepository {
   async getDashboardData() {
     try {
       const fieldRepo = new FieldApiRepository();
       const taskRepo = new TaskApiRepository();
 
-      // 1) Campos para preview
       const fields = await fieldRepo.getAll();
       const previewFields = (fields || []).slice(0, 4).map(f => ({
         id: f.id,
@@ -31,9 +23,7 @@ export class DashboardApiRepository extends DashboardRepository {
         location: f.location,
       }));
 
-      // 2) Tareas próximas: consumir API real /api/Tasks y filtrar por fecha si es necesario
       const rawTasks = await taskRepo.getAll();
-      // taskRepo devuelve Task domain con dueDate en formato DD/MM; para ordenar, convertimos a Date usando año actual
       const upcomingTasks = (rawTasks || [])
         .map(t => {
           const [day, month] = String(t.dueDate || '').split('/').map(Number);
@@ -49,10 +39,11 @@ export class DashboardApiRepository extends DashboardRepository {
       return new DashboardData({
         previewFields,
         recommendations: STATIC_RECOMMENDATIONS,
-        upcomingTasks
+        upcomingTasks,
       });
     } catch (error) {
-      throw new Error(error.message || 'Error al obtener datos de dashboard');
+      console.error('Error fetching dashboard data:', error);
+      throw new Error('Failed to fetch dashboard data');
     }
   }
 }

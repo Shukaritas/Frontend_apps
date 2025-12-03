@@ -1,26 +1,26 @@
 <template>
   <main class="auth-container">
     <section class="auth-card">
-      <h1>Iniciar sesión</h1>
+      <h1>{{ $t('iam.login.title') }}</h1>
 
       <form @submit.prevent="handleLogin" class="auth-form">
         <label>
-          <span>Email</span>
-          <input v-model="form.email" type="email" required placeholder="ejemplo@correo.com" />
+          <span>{{ $t('iam.login.email') }}</span>
+          <input v-model="form.email" type="email" required :placeholder="$t('iam.login.emailPlaceholder')" />
         </label>
 
         <label>
-          <span>Contraseña</span>
+          <span>{{ $t('iam.login.password') }}</span>
           <input v-model="form.password" type="password" required />
         </label>
 
         <button type="submit" :disabled="loading">
-          {{ loading ? 'Cargando...' : 'Iniciar sesión' }}
+          {{ loading ? $t('iam.login.loading') : $t('iam.login.submit') }}
         </button>
 
         <p class="alt-action">
-          ¿No tienes cuenta?
-          <router-link to="/register">Regístrate</router-link>
+          {{ $t('iam.login.noAccount') }}
+          <router-link to="/register">{{ $t('iam.login.goRegister') }}</router-link>
         </p>
       </form>
 
@@ -35,6 +35,9 @@
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n({ useScope: 'global' });
 
 const router = useRouter();
 const authStore = useAuthStore();

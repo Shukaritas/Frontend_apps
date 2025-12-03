@@ -16,13 +16,12 @@
       </li>
     </ul>
 
-    <!-- Sección de ubicación del usuario al fondo -->
     <div class="mt-auto location-card">
       <div class="location-icon-circle">
         <i class="pi pi-map-marker"></i>
       </div>
       <div class="location-text-container">
-        <div class="location-label">Mi ubicación</div>
+        <div class="location-label">{{ $t('sidebar.myLocation') }}</div>
         <div class="location-value">{{ locationDisplay }}</div>
       </div>
     </div>
@@ -30,36 +29,26 @@
 </template>
 
 <script setup>
-/**
- * @file Sidebar Component
- * @description A responsive navigation sidebar that displays links with icons.
- * It features a collapsibledesign and handles language translations for its items reactively.
- */
+
 import { ref, watch, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useLayoutStore } from '@/stores/layout.store';
 
 const layoutStore = useLayoutStore();
+const { t, locale } = useI18n({ useScope: 'global' });
 
-/**
- * Computed property que devuelve la ubicación formateada o un mensaje por defecto.
- * @returns {string} Cadena con formato "Ciudad, País" o "Ubicación desconocida"
- */
+
 const locationDisplay = computed(() => {
-  if (!layoutStore.userLocation) return 'Cargando...';
+  if (!layoutStore.isLocationPublic) return t('sidebar.location.anonymous');
+  if (!layoutStore.userLocation) return t('sidebar.location.loading');
   const { city, country_name } = layoutStore.userLocation;
   if (city && country_name) return `${city}, ${country_name}`;
   if (city) return city;
   if (country_name) return country_name;
-  return 'Ubicación desconocida';
+  return t('sidebar.location.unknown');
 });
 
-const { t, locale } = useI18n({ useScope: 'global' });
 
-/**
- * @const {Array<object>} baseNavItems
- * @description A static array of navigation item objects, each containing a translation key, icon name, and route.
- */
 const baseNavItems = [
   { labelKey: 'sidebar.dashboard', icon: 'dashboard', route: '/dashboard' },
   { labelKey: 'sidebar.manageCrops', icon: 'manage-crops', route: '/manage-crops' },
@@ -68,17 +57,10 @@ const baseNavItems = [
   { labelKey: 'sidebar.community', icon: 'community', route: '/community' },
 ];
 
-/**
- * @type {import('vue').Ref<Array<object>>}
- * @description A reactive reference to the array of navigation items that will be rendered.
- * This array is updated with translated labels whenever the locale changes.
- */
+
 const navItems = ref([]);
 
-/**
- * Translates the labels of the base navigation items and updates the reactive `navItems` array.
- * @function
- */
+
 const translateNavItems = () => {
   navItems.value = baseNavItems.map(item => ({
     ...item,
@@ -86,17 +68,10 @@ const translateNavItems = () => {
   }));
 };
 
-/**
- * Watches for changes in the global `locale` and re-translates the navigation items.
- * The `immediate: true` option ensures it runs once on component mount.
- */
+
 watch(locale, translateNavItems, { immediate: true });
 
-/**
- * Generates the correct URL for a given SVG icon name from the assets folder.
- * @param {string} name - The name of the SVG file (without extension).
- * @returns {string} The resolved URL for the asset.
- */
+
 const getIconUrl = (name) => {
   return new URL(`../../assets/${name}.svg`, import.meta.url).href;
 };
@@ -123,7 +98,6 @@ a:not(.bg-primary):hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Estilos para la tarjeta de ubicación */
 .location-card {
   display: flex;
   align-items: center;

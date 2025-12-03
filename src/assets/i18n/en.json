@@ -6,7 +6,17 @@
     "task": "Task",
     "due_date": "Due Date",
     "actions": "Actions",
-    "recommendatios": "Lastest Recommendations"
+    "recommendatios": "Lastest Recommendations",
+    "empty": "No content yet",
+    "emptySections": {
+      "fields": "You have no fields yet",
+      "tasks": "No upcoming tasks",
+      "recommendations": "No recommendations yet"
+    },
+    "errors": {
+      "unauthenticated": "User not authenticated",
+      "loadFailed": "Error loading dashboard data"
+    }
   },
 
   "sidebar": {
@@ -14,7 +24,13 @@
     "manageCrops": "Manage Crops",
     "myFields": "My Fields",
     "myTasks": "My Tasks",
-    "community": "Community"
+    "community": "Community",
+    "myLocation": "My Location",
+    "location": {
+      "loading": "Loading...",
+      "anonymous": "Anonymous Location",
+      "unknown": "Unknown location"
+    }
   },
   "header": {
     "profile": "Profile",
@@ -103,6 +119,7 @@
     "errorUpdateCrop": "Could not update crop",
     "errorDeleteCrop": "Could not delete crop",
     "errorLoadCrops": "Could not load crops",
+    "pagination": "Showing {first} to {last} of {totalRecords} crops",
     "validation": {
       "cropNameRequired": "Crop name is required",
       "plantingDateRequired": "Planting date is required",
@@ -110,6 +127,10 @@
       "fieldRequired": "Field is required",
       "statusRequired": "Status is required",
       "daysRequired": "Days are required"
+    },
+    "tooltip": {
+      "edit": "Edit crop",
+      "delete": "Delete crop"
     }
   },
   "registerCrop": {
@@ -172,6 +193,63 @@
   "community": {
     "title": "What Our Community Says",
     "description": "Real feedback from real users who have transformed their workflow with our application. Join thousands of satisfied customers worldwide.",
-    "quantity": "Comments"
+    "quantity": "Comments",
+    "actions": {
+      "addComment": "Add Comment",
+      "newComment": "New Comment",
+      "editComment": "Edit Comment",
+      "commentLabel": "Comment",
+      "commentPlaceholder": "Write your comment...",
+      "commentRequired": "Comment is required",
+      "cancel": "Cancel",
+      "update": "Update",
+      "post": "Post"
+    },
+    "toasts": {
+      "updated": "Comment updated",
+      "posted": "Comment posted",
+      "error": "Error"
+    }
+  },
+  "myTasks": {
+    "title": "My Tasks",
+    "total": "Total Tasks",
+    "empty": "No tasks found.",
+    "toasts": {
+      "updated": "Task updated successfully.",
+      "created": "Task created.",
+      "saveError": "Could not save the task.",
+      "success": "Success",
+      "error": "Error"
+    }
+  },
+  "iam": {
+    "login": {
+      "title": "Sign in",
+      "email": "Email",
+      "emailPlaceholder": "example@mail.com",
+      "password": "Password",
+      "submit": "Sign in",
+      "loading": "Loading...",
+      "noAccount": "Don't have an account?",
+      "goRegister": "Register"
+    },
+    "register": {
+      "title": "Create account",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "dni": "ID (8 digits)",
+      "dniPlaceholder": "12345678",
+      "phone": "Phone (with country code)",
+      "phonePlaceholder": "+19999999999",
+      "email": "Email",
+      "emailPlaceholder": "example@mail.com",
+      "password": "Password",
+      "submit": "Create account",
+      "loading": "Registering...",
+      "haveAccount": "Already have an account?",
+      "goLogin": "Sign in",
+      "success": "Account created successfully! Redirecting to login..."
+    }
   }
 }
