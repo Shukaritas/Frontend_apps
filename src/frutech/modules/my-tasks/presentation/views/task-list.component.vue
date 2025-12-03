@@ -60,7 +60,7 @@
 
     <div v-else class="empty-state">
       <i class="pi pi-inbox" style="font-size: 3rem; color: var(--surface-400);"></i>
-      <p>No tasks found.</p>
+      <p>{{ $t('myTasks.empty') }}</p>
     </div>
   </div>
 </template>

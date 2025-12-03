@@ -8,64 +8,68 @@
       <Message severity="error" :closable="false">{{ error }}</Message>
     </div>
 
-    <div v-else class="grid gap-4">
-      <div class="col-12">
-        <Card class="preview-fields-card">
-          <template #title>
-            <div class="flex justify-content-between align-items-center">
-              <h1 class="m-0">{{ $t('sidebar.dashboard') }}</h1>
-              <Button :label="$t('dashboard.addNewCrop')" icon="pi pi-plus" @click="goToMyFields" />
-            </div>
-          </template>
-          <template #content>
-            <div class="field-items-container">
-              <div v-for="field in userFields" :key="field.id" class="field-item">
-                <img
-                  :src="field.imageUrl"
-                  :alt="field.name"
-                  class="field-image"
-                  @error="handleImageError"
-                >
-                <span class="field-title mt-2">{{ field.name }}</span>
+    <div v-else>
+      <div v-if="!userFields.length && !upcomingTasks.length && !recommendations.length" class="p-4">
+        <Message severity="info" :closable="false">{{ $t('dashboard.empty') }}</Message>
+      </div>
+      <div v-else class="grid gap-4">
+        <div class="col-12">
+          <Card class="preview-fields-card">
+            <template #title>
+              <div class="flex justify-content-between align-items-center">
+                <h1 class="m-0">{{ $t('sidebar.dashboard') }}</h1>
+                <Button :label="$t('dashboard.addNewCrop')" icon="pi pi-plus" @click="goToMyFields" />
               </div>
-            </div>
-          </template>
-        </Card>
-      </div>
+            </template>
+            <template #content>
+              <div class="field-items-container">
+                <div v-for="field in userFields" :key="field.id" class="field-item">
+                  <img
+                    :src="field.imageUrl"
+                    :alt="field.name"
+                    class="field-image"
+                    @error="handleImageError"
+                  >
+                  <span class="field-title mt-2">{{ field.name }}</span>
+                </div>
+              </div>
+            </template>
+          </Card>
+        </div>
 
-      <div class="col-12">
-        <Card>
-          <template #title>
-            <div class="flex justify-content-between align-items-center">
-              <h2 class="m-0 text-xl font-semibold">{{ $t('sidebar.myTasks') }}</h2>
-              <Button :label="$t('dashboard.view_tasks')" @click="goToMyTasks" text />
-            </div>
-          </template>
-          <template #content>
-            <DataTable :value="upcomingTasks" responsiveLayout="scroll">
-              <Column field="field" :header="$t('dashboard.crop_name')"></Column>
-              <Column field="description" :header="$t('dashboard.task')"></Column>
-              <Column field="dueDate" :header="$t('dashboard.due_date')"></Column>
-              <Column :header="$t('dashboard.actions')">
-                <template #body>
-                  <Checkbox :binary="true" />
-                </template>
-              </Column>
-            </DataTable>
-          </template>
-        </Card>
-      </div>
+        <div class="col-12">
+          <Card>
+            <template #title>
+              <div class="flex justify-content-between align-items-center">
+                <h2 class="m-0 text-xl font-semibold">{{ $t('sidebar.myTasks') }}</h2>
+                <Button :label="$t('dashboard.view_tasks')" @click="goToMyTasks" text />
+              </div>
+            </template>
+            <template #content>
+              <DataTable :value="upcomingTasks" responsiveLayout="scroll">
+                <Column field="field" :header="$t('dashboard.crop_name')"></Column>
+                <Column field="description" :header="$t('dashboard.task')"></Column>
+                <Column field="dueDate" :header="$t('dashboard.due_date')"></Column>
+                <Column :header="$t('dashboard.actions')">
+                  <template #body>
+                    <Checkbox :binary="true" />
+                  </template>
+                </Column>
+              </DataTable>
+            </template>
+          </Card>
+        </div>
 
-      <!-- Recomendaciones mantiene la estructura original si existe otra fuente de datos -->
-      <div class="col-12" v-if="recommendations.length">
-        <Card>
-          <template #title><h2 class="m-0 text-xl font-semibold">{{ $t('dashboard.recommendatios') }}</h2></template>
-          <template #content>
-            <div v-for="rec in recommendations" :key="rec.id" class="mb-3">
-              <p><strong class="font-semibold">{{ rec.title }}:</strong> {{ rec.content }}</p>
-            </div>
-          </template>
-        </Card>
+        <div class="col-12" v-if="recommendations.length">
+          <Card>
+            <template #title><h2 class="m-0 text-xl font-semibold">{{ $t('dashboard.recommendatios') }}</h2></template>
+            <template #content>
+              <div v-for="rec in recommendations" :key="rec.id" class="mb-3">
+                <p><strong class="font-semibold">{{ rec.title }}:</strong> {{ rec.content }}</p>
+              </div>
+            </template>
+          </Card>
+        </div>
       </div>
     </div>
   </div>

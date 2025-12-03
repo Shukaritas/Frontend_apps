@@ -7,6 +7,8 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import apiClient from '@/services/http-common.js';
 
+const LOCATION_ENDPOINT = import.meta.env.VITE_ENDPOINT_LOCATION;
+
 export const useLayoutStore = defineStore('layout', () => {
     /**
      * Reactive state that holds the visibility status of the sidebar.
@@ -48,7 +50,7 @@ export const useLayoutStore = defineStore('layout', () => {
     async function fetchUserLocation() {
         if (userLocation.value) return; // cache guard: evita llamadas repetidas
         try {
-            const { data } = await apiClient.get('/v1/location');
+            const { data } = await apiClient.get(LOCATION_ENDPOINT);
             // Normalizar las claves que vienen del backend
             const city = data?.city ?? data?.City ?? '';
             const country_name = data?.country_name ?? data?.countryName ?? data?.Country ?? '';

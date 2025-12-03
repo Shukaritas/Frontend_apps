@@ -2,8 +2,7 @@ import apiClient from '@/services/http-common.js';
 import { TaskRepository } from '../domain/repositories/task.repository';
 import { Task } from '../domain/models/task.entity';
 
-// NOTA: Backend real usa /api/Tasks (sin v1). BaseURL es /api, por lo tanto usamos "/Tasks".
-const TASKS_ENDPOINT = '/Tasks';
+const TASKS_ENDPOINT = import.meta.env.VITE_ENDPOINT_TASKS;
 
 function isoToDDMM(iso) {
   if (!iso) return '01/01';

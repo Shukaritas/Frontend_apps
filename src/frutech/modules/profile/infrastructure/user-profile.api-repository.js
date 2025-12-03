@@ -2,6 +2,8 @@ import http from '@/services/http-common.js';
 import { UserProfileRepository } from '../domain/repositories/user-profile.repository';
 import { UserProfile } from '../domain/models/user-profile.model';
 
+const USERS_ENDPOINT = import.meta.env.VITE_ENDPOINT_USERS;
+
 /**
  * @class UserProfileApiRepository
  * @classdesc Implementación contra API .NET real.
@@ -12,7 +14,7 @@ import { UserProfile } from '../domain/models/user-profile.model';
  *  - DELETE /api/v1/users/{id}
  */
 export class UserProfileApiRepository extends UserProfileRepository {
-    endpoint = '/v1/users';
+    endpoint = USERS_ENDPOINT;
 
     /**
      * Mapea UserResource (API) a entidad de dominio.

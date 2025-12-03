@@ -1,6 +1,8 @@
 import http from '@/services/http-common';
 import { User } from '../domain/models/user.model';
 
+const USERS_ENDPOINT = import.meta.env.VITE_ENDPOINT_USERS;
+
 function findJwtInObject(obj) {
   const isJwt = (val) => typeof val === 'string' && val.split('.').length === 3;
   const stack = [obj];
@@ -50,7 +52,7 @@ export class AuthApiRepository {
    */
   async login(email, password) {
     try {
-      const resp = await http.post('/v1/users/sign-in', { email, password });
+      const resp = await http.post(`${USERS_ENDPOINT}/sign-in`, { email, password });
       let data = resp?.data;
 
       // 1) Si data es string, asúmelo como token
@@ -130,7 +132,7 @@ export class AuthApiRepository {
     try {
       if (!email || !password) throw new Error('Email y password son requeridos');
       const payload = { userName: username, email, phoneNumber, identificator, password };
-      const response = await http.post('/v1/users/sign-up', payload);
+      const response = await http.post(`${USERS_ENDPOINT}/sign-up`, payload);
       return response.data;
     } catch (error) {
       throw new Error(error.message || 'Error en el registro');

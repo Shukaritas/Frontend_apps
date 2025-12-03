@@ -2,6 +2,8 @@ import http from '@/services/http-common.js';
 import { CropRepository } from '../domain/repositories/crop.repository';
 import { Crop } from '../domain/models/crop.model';
 
+const CROP_FIELDS_ENDPOINT = import.meta.env.VITE_ENDPOINT_CROP_FIELDS;
+
 /**
  * Convierte fecha DD/MM/YYYY a formato ISO YYYY-MM-DD
  * @param {string} dateStr - Fecha en formato DD/MM/YYYY
@@ -27,7 +29,7 @@ function convertToISODate(dateStr) {
  * @extends CropRepository
  */
 export class CropApiRepository extends CropRepository {
-    endpoint = '/v1/CropFields';
+    endpoint = CROP_FIELDS_ENDPOINT;
 
     /**
      * Maps API data to the Crop domain model.

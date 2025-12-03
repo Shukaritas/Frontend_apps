@@ -2,6 +2,10 @@ import { IFieldRepository } from "@/frutech/modules/my-fields/domain/model/field
 import { FieldAssembler } from "@/frutech/modules/my-fields/application/field.assembler.js";
 import http from '@/services/http-common.js';
 
+const FIELDS_ENDPOINT = import.meta.env.VITE_ENDPOINT_FIELDS;
+const PROGRESS_ENDPOINT = import.meta.env.VITE_ENDPOINT_PROGRESS;
+const TASKS_ENDPOINT = import.meta.env.VITE_ENDPOINT_TASKS;
+
 /**
  * Convierte fecha DD/MM/YYYY a formato ISO YYYY-MM-DD
  * @param {string} dateStr - Fecha en formato DD/MM/YYYY o cualquier formato de fecha
@@ -64,14 +68,14 @@ export class FieldApiRepository extends IFieldRepository {
     }
 
     // Único intento: endpoint correcto. Si falla se deja que el store maneje el error.
-    const response = await http.get(`/v1/Fields/user/${userId}`);
+    const response = await http.get(`${FIELDS_ENDPOINT}/user/${userId}`);
     const data = Array.isArray(response.data) ? response.data : [];
     return FieldAssembler.toModels(data);
   }
 
   async getById(id) {
     try {
-      const response = await http.get(`/v1/Fields/${id}`);
+      const response = await http.get(`${FIELDS_ENDPOINT}/${id}`);
       return FieldAssembler.toModel(response.data);
     } catch (error) {
       throw new Error(error.message || 'Error obteniendo campo');
@@ -104,7 +108,7 @@ export class FieldApiRepository extends IFieldRepository {
         formData.append('Image', fieldData.imageFile);
       }
 
-      const response = await http.post('/v1/Fields', formData, {
+      const response = await http.post(FIELDS_ENDPOINT, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       return FieldAssembler.toModel(response.data);
@@ -117,7 +121,7 @@ export class FieldApiRepository extends IFieldRepository {
   async updateField(id, fieldData) {
     try {
       const payload = FieldAssembler.toPayload(fieldData);
-      const response = await http.put(`/v1/Fields/${id}`, payload);
+      const response = await http.put(`${FIELDS_ENDPOINT}/${id}`, payload);
       return FieldAssembler.toModel(response.data);
     } catch (error) {
       throw new Error(error.message || 'Error actualizando campo');
@@ -181,7 +185,7 @@ export class FieldApiRepository extends IFieldRepository {
         payload.Pests = false;
       }
 
-      const response = await http.put(`/v1/progress/${progressId}`, payload);
+      const response = await http.put(`${PROGRESS_ENDPOINT}/${progressId}`, payload);
       return response.data;
     } catch (error) {
       const message = error?.response?.data?.message || error?.message || 'Error actualizando progreso';
@@ -207,7 +211,7 @@ export class FieldApiRepository extends IFieldRepository {
       };
 
       // Nota: http-common ya tiene baseURL='/api', por lo que '/Tasks' resulta en '/api/Tasks'
-      const response = await http.post('/Tasks', payload);
+      const response = await http.post(TASKS_ENDPOINT, payload);
       return response.data;
     } catch (error) {
       const message = error?.response?.data?.message || error?.message || 'Error creando tarea';

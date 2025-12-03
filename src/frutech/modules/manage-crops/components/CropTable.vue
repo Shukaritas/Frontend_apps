@@ -21,7 +21,7 @@
         :rows="10"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         :rowsPerPageOptions="[5,10,25]"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} cultivos"
+        :currentPageReportTemplate="$t('manageCrops.pagination')"
         responsiveLayout="scroll"
         class="p-datatable-sm"
       >

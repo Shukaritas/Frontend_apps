@@ -2,7 +2,7 @@
   <div class="community-page">
     <div class="header-row">
       <CommunityHeader />
-      <Button label="Add Comment" icon="pi pi-plus" @click="openNewCommentDialog" class="add-comment-btn" />
+      <Button :label="$t('community.actions.addComment')" icon="pi pi-plus" @click="openNewCommentDialog" class="add-comment-btn" />
     </div>
     <div class="community-content">
       <CommunityCommentList @edit="handleEditComment" />
@@ -11,7 +11,7 @@
     <!-- Dialog mejorado con modo edición -->
     <Dialog
       v-model:visible="showDialog"
-      :header="editingComment ? 'Edit Comment' : 'New Comment'"
+      :header="editingComment ? $t('community.actions.editComment') : $t('community.actions.newComment')"
       :modal="true"
       :closable="true"
       @hide="resetDialog"
@@ -19,24 +19,24 @@
     >
       <div class="flex flex-column gap-3">
         <div class="field">
-          <label for="commentText" class="font-semibold">Comment</label>
+          <label for="commentText" class="font-semibold">{{ $t('community.actions.commentLabel') }}</label>
           <Textarea
             id="commentText"
             v-model="newComment"
             rows="5"
             autoResize
             class="w-full"
-            placeholder="Write your comment..."
+            :placeholder="$t('community.actions.commentPlaceholder')"
             :class="{ 'p-invalid': submitAttempt && !newComment.trim() }"
           />
-          <small v-if="submitAttempt && !newComment.trim()" class="p-error">Comment is required</small>
+          <small v-if="submitAttempt && !newComment.trim()" class="p-error">{{ $t('community.actions.commentRequired') }}</small>
         </div>
       </div>
       <template #footer>
         <div class="flex justify-content-end gap-2">
-          <Button label="Cancel" text @click="showDialog = false; resetDialog()" />
+          <Button :label="$t('community.actions.cancel')" text @click="showDialog = false; resetDialog()" />
           <Button
-            :label="editingComment ? 'Update' : 'Post'"
+            :label="editingComment ? $t('community.actions.update') : $t('community.actions.post')"
             :disabled="posting"
             :loading="posting"
             @click="onSubmitComment"
@@ -56,6 +56,9 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Textarea from 'primevue/textarea';
 import { useToast } from 'primevue/usetoast';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n({ useScope: 'global' });
 
 const communityStore = useCommunityStore();
 const toast = useToast();
@@ -99,16 +102,16 @@ async function onSubmitComment() {
     if (editingComment.value) {
       // Modo edición
       await communityStore.editComment(editingComment.value.id, newComment.value);
-      toast.add({ severity: 'success', summary: 'Comentario actualizado', life: 2500 });
+      toast.add({ severity: 'success', summary: t('community.toasts.updated'), life: 2500 });
     } else {
       // Modo creación
       await communityStore.createComment(newComment.value);
-      toast.add({ severity: 'success', summary: 'Comentario publicado', life: 2500 });
+      toast.add({ severity: 'success', summary: t('community.toasts.posted'), life: 2500 });
     }
     showDialog.value = false;
     resetDialog();
   } catch (e) {
-    toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 3000 });
+    toast.add({ severity: 'error', summary: t('community.toasts.error'), detail: e.message, life: 3000 });
   } finally {
     posting.value = false;
   }

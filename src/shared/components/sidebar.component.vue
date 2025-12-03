@@ -22,7 +22,7 @@
         <i class="pi pi-map-marker"></i>
       </div>
       <div class="location-text-container">
-        <div class="location-label">Mi ubicación</div>
+        <div class="location-label">{{ $t('sidebar.myLocation') }}</div>
         <div class="location-value">{{ locationDisplay }}</div>
       </div>
     </div>
