@@ -17,13 +17,14 @@
     </ul>
 
     <!-- Sección de ubicación del usuario al fondo -->
-    <div class="mt-auto p-3 text-sm text-color-secondary">
-      <template v-if="layoutStore.userLocation">
-        <span> {{ layoutStore.userLocation.city }}, {{ layoutStore.userLocation.country_name }}</span>
-      </template>
-      <template v-else>
-        <span> Cargando ubicación...</span>
-      </template>
+    <div class="mt-auto location-card">
+      <div class="location-icon-circle">
+        <i class="pi pi-map-marker"></i>
+      </div>
+      <div class="location-text-container">
+        <div class="location-label">Mi ubicación</div>
+        <div class="location-value">{{ locationDisplay }}</div>
+      </div>
     </div>
   </aside>
 </template>
@@ -34,11 +35,24 @@
  * @description A responsive navigation sidebar that displays links with icons.
  * It features a collapsibledesign and handles language translations for its items reactively.
  */
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useLayoutStore } from '@/stores/layout.store';
 
 const layoutStore = useLayoutStore();
+
+/**
+ * Computed property que devuelve la ubicación formateada o un mensaje por defecto.
+ * @returns {string} Cadena con formato "Ciudad, País" o "Ubicación desconocida"
+ */
+const locationDisplay = computed(() => {
+  if (!layoutStore.userLocation) return 'Cargando...';
+  const { city, country_name } = layoutStore.userLocation;
+  if (city && country_name) return `${city}, ${country_name}`;
+  if (city) return city;
+  if (country_name) return country_name;
+  return 'Ubicación desconocida';
+});
 
 const { t, locale } = useI18n({ useScope: 'global' });
 
@@ -107,5 +121,64 @@ a.bg-primary {
 }
 a:not(.bg-primary):hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Estilos para la tarjeta de ubicación */
+.location-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(168, 191, 168, 0.3);
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.location-icon-circle {
+  background: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.location-icon-circle i {
+  color: gray;
+  font-size: 1.2rem;
+}
+
+.location-text-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden;
+}
+
+.location-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.location-value {
+  font-size: 0.9rem;
+  color: #ffffff;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.location-value{
+  color: var(--p-text-color)
+}
+.location-label{
+  color: var(--p-text-color)
 }
 </style>
