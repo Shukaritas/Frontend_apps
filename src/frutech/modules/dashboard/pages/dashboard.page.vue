@@ -9,7 +9,6 @@
     </div>
 
     <div v-else class="grid gap-4">
-      <!-- Sección de campos -->
       <div class="col-12">
         <Card class="preview-fields-card">
           <template #title>
@@ -37,7 +36,6 @@
         </Card>
       </div>
 
-      <!-- Sección de tareas próximas -->
       <div class="col-12">
         <Card>
           <template #title>
@@ -64,10 +62,6 @@
         </Card>
       </div>
 
-<<<<<<< HEAD
-=======
-      <!-- Sección de recomendaciones -->
->>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
       <div class="col-12">
         <Card>
           <template #title><h2 class="m-0 text-xl font-semibold">{{ $t('dashboard.recommendatios') }}</h2></template>

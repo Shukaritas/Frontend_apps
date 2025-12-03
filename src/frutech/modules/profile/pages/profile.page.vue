@@ -44,17 +44,7 @@
 </template>
 
 <script setup>
-<<<<<<< HEAD
 
-=======
-/**
- * @file Profile Page Component
- * @description This page serves as the main user profile interface, allowing users to view and edit
- * their personal information, change their password, and manage account settings. It orchestrates
- * child components and communicates with the Pinia store for state management.
- * @author Estefano Solis
- */
->>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
 import { onMounted, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -105,17 +95,7 @@ onMounted(() => {
 
   userProfileStore.fetchProfile(id);
 
-<<<<<<< HEAD
   preferences.location = !!layoutStore.isLocationPublic;
-=======
-  // Sincronizar el estado inicial del switch de ubicación con el store
-  preferences.location = !!layoutStore.isLocationPublic;
-});
-
-// Mantener el store sincronizado si el usuario cambia el toggle
-watch(() => preferences.location, (val) => {
-  layoutStore.toggleLocationPrivacy(val);
->>>>>>> d287244216b8ee9be0ab229d2ec10e615e422fe3
 });
 
 watch(() => preferences.location, (val) => {
