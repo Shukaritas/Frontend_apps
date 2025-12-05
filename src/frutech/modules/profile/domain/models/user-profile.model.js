@@ -8,9 +8,10 @@
  * @param {string} profileData.phoneNumber - The user's phone number.
  * @param {string} profileData.identificator - The user's identity document.
  * @param {string} profileData.password - The user's password.
+ * @param {number} [profileData.roleId] - The user's role ID (optional).
  * @throws {Error} If any validation fails.
  */
-function validateUserProfile({ id, name, email, phoneNumber, identificator, password }) {
+function validateUserProfile({ id, name, email, phoneNumber, identificator, password, roleId }) {
     if (typeof id !== 'number') throw new Error('ID must be a number.');
     if (typeof name !== 'string' || name.length < 3) throw new Error('Name must be at least 3 characters long.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Invalid email format.');
@@ -21,6 +22,7 @@ function validateUserProfile({ id, name, email, phoneNumber, identificator, pass
 
     if (!/^\d{8}$/.test(identificator)) throw new Error('Document must have 8 digits.');
     if (typeof password !== 'string' || password.length === 0) throw new Error('Password is required.');
+    if (roleId !== undefined && typeof roleId !== 'number') throw new Error('Role ID must be a number.');
 }
 
 /**
@@ -38,15 +40,17 @@ export class UserProfile {
      * @param {string} profileData.phoneNumber - The user's phone number.
      * @param {string} profileData.identificator - The user's identity document.
      * @param {string} profileData.password - The user's password.
+     * @param {number} [profileData.roleId] - The user's role ID (optional).
      */
-    constructor({ id, name, email, phoneNumber, identificator, password }) {
-        validateUserProfile({ id, name, email, phoneNumber, identificator, password });
+    constructor({ id, name, email, phoneNumber, identificator, password, roleId }) {
+        validateUserProfile({ id, name, email, phoneNumber, identificator, password, roleId });
         this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.identificator = identificator;
         this.password = password;
+        this.roleId = roleId || 0;
     }
 
     /**

@@ -49,6 +49,7 @@
     "email": "E-mail",
     "phoneNumber": "Número de teléfono",
     "identityDocument": "Documento de identidad",
+    "role": "Rol de Agricultor",
     "editInfo": "Editar información",
     "saveChanges": "Guardar cambios",
     "cancel": "Cancelar",
@@ -249,11 +250,22 @@
       "email": "Email",
       "emailPlaceholder": "ejemplo{'@'}correo.com",
       "password": "Contraseña",
+      "role": "Rol de Agricultor",
+      "rolePlaceholder": "Selecciona tu rol",
+      "roles": {
+        "expert": "Agricultor Experto",
+        "novice": "Agricultor Novato"
+      },
       "submit": "Crear cuenta",
       "loading": "Registrando...",
       "haveAccount": "¿Ya tienes cuenta?",
       "goLogin": "Inicia sesión",
       "success": "¡Cuenta creada con éxito! Redirigiendo al login..."
     }
+  },
+  "roles": {
+    "0": "Sin Asignar",
+    "1": "Agricultor Experto",
+    "2": "Agricultor Novato"
   }
 }

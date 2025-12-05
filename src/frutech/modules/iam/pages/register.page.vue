@@ -36,6 +36,19 @@
           <input v-model="form.password" type="password" required />
         </label>
 
+        <label>
+          <span>{{ $t('iam.register.role') }}</span>
+          <Dropdown
+            v-model="form.roleId"
+            :options="roleOptions"
+            optionLabel="label"
+            optionValue="value"
+            :placeholder="$t('iam.register.rolePlaceholder')"
+            required
+            class="role-dropdown"
+          />
+        </label>
+
         <button type="submit" :disabled="loading">
           {{ loading ? $t('iam.register.loading') : $t('iam.register.submit') }}
         </button>
@@ -57,10 +70,11 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
 import { useI18n } from 'vue-i18n';
+import Dropdown from 'primevue/dropdown';
 
 const { t } = useI18n({ useScope: 'global' });
 
@@ -75,8 +89,14 @@ const form = reactive({
   identificator: '',
   phoneNumber: '',
   email: '',
-  password: ''
+  password: '',
+  roleId: null
 });
+
+const roleOptions = computed(() => [
+  { label: t('iam.register.roles.expert'), value: 1 },
+  { label: t('iam.register.roles.novice'), value: 2 }
+]);
 
 const validateNumberInput = (event) => {
   form.identificator = event.target.value.replace(/\D/g, '');
@@ -168,6 +188,32 @@ const handleRegister = async () => {
 .auth-form input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(36, 95, 53, 0.15);
+}
+
+.auth-form :deep(.p-dropdown) {
+  width: 100%;
+  border: 1px solid #d8e8d8;
+  border-radius: 10px;
+  background: #ffffff;
+  font-family: inherit;
+}
+
+.auth-form :deep(.p-dropdown:not(.p-disabled):hover) {
+  border-color: var(--primary);
+}
+
+.auth-form :deep(.p-dropdown:not(.p-disabled).p-focus) {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(36, 95, 53, 0.15);
+}
+
+.auth-form :deep(.p-dropdown .p-dropdown-label) {
+  padding: 10px 12px;
+  color: var(--text);
+}
+
+.auth-form :deep(.p-dropdown .p-dropdown-trigger) {
+  color: var(--primary);
 }
 
 .auth-form button {

@@ -25,8 +25,9 @@ export class UserProfileApiRepository extends UserProfileRepository {
         const email = api.email ?? api.Email;
         const phoneNumber = api.phoneNumber ?? api.PhoneNumber;
         const identificator = api.identificator ?? api.Identificator;
+        const roleId = api.roleId ?? api.RoleId;
         const password = '******';
-        return new UserProfile({ id: Number(id), name, email, phoneNumber, identificator, password });
+        return new UserProfile({ id: Number(id), name, email, phoneNumber, identificator, password, roleId: roleId ? Number(roleId) : undefined });
     }
 
     /**

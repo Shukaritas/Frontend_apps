@@ -49,6 +49,7 @@
     "email": "E-mail",
     "phoneNumber": "Phone Number",
     "identityDocument": "Identity Document",
+    "role": "Farmer Role",
     "editInfo": "Edit Information",
     "saveChanges": "Save Changes",
     "cancel": "Cancel",
@@ -249,11 +250,22 @@
       "email": "Email",
       "emailPlaceholder": "example{'@'}mail.com",
       "password": "Password",
+      "role": "Farmer Role",
+      "rolePlaceholder": "Select your role",
+      "roles": {
+        "expert": "Expert Farmer",
+        "novice": "Novice Farmer"
+      },
       "submit": "Create account",
       "loading": "Registering...",
       "haveAccount": "Already have an account?",
       "goLogin": "Sign in",
       "success": "Account created successfully! Redirecting to login..."
     }
+  },
+  "roles": {
+    "0": "Unassigned",
+    "1": "Expert Farmer",
+    "2": "Novice Farmer"
   }
 }

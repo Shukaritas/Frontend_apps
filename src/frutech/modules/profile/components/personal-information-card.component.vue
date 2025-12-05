@@ -35,6 +35,13 @@
         </div>
       </div>
 
+      <div class="field grid align-items-center">
+        <label class="col-12 md:col-4">{{ t('profile.role') }}</label>
+        <div class="col-12 md:col-8">
+          <InputText :model-value="roleLabel" class="w-full" disabled />
+        </div>
+      </div>
+
       <div class="flex justify-content-end gap-2 mt-4">
         <Button v-if="!isEditing" :label="t('profile.editInfo')" icon="pi pi-pencil" @click="isEditing = true" />
         <template v-else>
@@ -50,7 +57,7 @@
 /**
  * @author Estefano Solis
  */
-import { ref, watch, reactive } from 'vue';
+import { ref, watch, reactive, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
@@ -63,6 +70,14 @@ const emit = defineEmits(['save']);
 const isEditing = ref(false);
 const localProfile = reactive({ ...props.profile });
 const errors = reactive({});
+
+/**
+ * Computed property to get the role label based on roleId
+ */
+const roleLabel = computed(() => {
+  const roleId = localProfile.roleId || 0;
+  return t(`roles.${roleId}`);
+});
 
 watch(() => props.profile, (newVal) => {
   Object.assign(localProfile, newVal);

@@ -118,10 +118,10 @@ export class AuthApiRepository {
    * Registro de usuario.
    * Endpoint: POST /api/v1/users/sign-up via baseURL /api
    */
-  async register({ username, email, phoneNumber, identificator, password }) {
+  async register({ username, email, phoneNumber, identificator, password, roleId }) {
     try {
       if (!email || !password) throw new Error('Email y password son requeridos');
-      const payload = { userName: username, email, phoneNumber, identificator, password };
+      const payload = { userName: username, email, phoneNumber, identificator, password, roleId };
       const response = await http.post(`${USERS_ENDPOINT}/sign-up`, payload);
       return response.data;
     } catch (error) {

@@ -3,13 +3,14 @@
  * @description Entidad que representa al usuario en el contexto de autenticación.
  */
 export class User {
-    constructor({ id, username, email, password, phoneNumber, identificator }) {
+    constructor({ id, username, email, password, phoneNumber, identificator, roleId }) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.identificator = identificator;
+        this.roleId = roleId;
         this.validate();
     }
 
