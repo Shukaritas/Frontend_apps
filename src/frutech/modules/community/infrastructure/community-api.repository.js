@@ -1,9 +1,7 @@
-import { CommunityRepository } from '../domain/repositories/community.repository.js';
+﻿import { CommunityRepository } from '../domain/repositories/community.repository.js';
 import { CommunityRecommendation } from '../domain/models/community-recommendation.entity.js';
 import http from '@/services/http-common.js';
-
 const COMMUNITY_RECOMMENDATION_ENDPOINT = import.meta.env.VITE_ENDPOINT_COMMUNITY_RECOMMENDATION;
-
 /**
  *  CommunityRepository implementation using real HTTP API.
  */
@@ -19,7 +17,6 @@ export class CommunityApiRepository extends CommunityRepository {
       item.role || item.Role || ''
     ));
   }
-
   async getRecommendationById(id) {
     const resp = await http.get(`${COMMUNITY_RECOMMENDATION_ENDPOINT}/${id}`);
     const r = resp.data;
@@ -32,7 +29,6 @@ export class CommunityApiRepository extends CommunityRepository {
       r.role || r.Role || ''
     );
   }
-
   async createRecommendation(payload) {
     // payload: { userName, comment }
     if (!payload || !payload.userName || !payload.comment) {
@@ -52,7 +48,6 @@ export class CommunityApiRepository extends CommunityRepository {
       data.role || data.Role || ''
     );
   }
-
   /**
    * Actualiza el contenido de un comentario existente.
    * @param {number} id - ID del comentario a actualizar
@@ -76,4 +71,3 @@ export class CommunityApiRepository extends CommunityRepository {
     );
   }
 }
-
