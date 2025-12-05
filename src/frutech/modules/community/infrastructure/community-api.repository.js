@@ -15,7 +15,8 @@ export class CommunityApiRepository extends CommunityRepository {
       item.id,
       item.userName || item.user || item.author || 'Community',
       item.commentDate || item.CommentDate || '',
-      item.comment || item.description || item.text || ''
+      item.comment || item.description || item.text || '',
+      item.role || item.Role || ''
     ));
   }
 
@@ -27,7 +28,8 @@ export class CommunityApiRepository extends CommunityRepository {
       r.id,
       r.userName || r.user || r.author || 'Community',
       r.commentDate || r.CommentDate || '',
-      r.comment || r.description || r.text || ''
+      r.comment || r.description || r.text || '',
+      r.role || r.Role || ''
     );
   }
 
@@ -46,7 +48,8 @@ export class CommunityApiRepository extends CommunityRepository {
       data.id,
       data.userName || data.user || 'Community',
       data.commentDate || data.CommentDate || '',
-      data.comment || data.description || data.text || payload.comment
+      data.comment || data.description || data.text || payload.comment,
+      data.role || data.Role || ''
     );
   }
 
@@ -68,7 +71,9 @@ export class CommunityApiRepository extends CommunityRepository {
       data.id || id,
       data.userName || data.user || 'Community',
       data.commentDate || data.CommentDate || '',
-      data.comment || data.description || data.text || comment
+      data.comment || data.description || data.text || comment,
+      data.role || data.Role || ''
     );
   }
 }
+

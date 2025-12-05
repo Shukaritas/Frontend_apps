@@ -1,8 +1,15 @@
 <template>
   <div class="community-comment-card">
     <div class="card-header">
-      <span class="author">{{ comment.user }}</span>
-      <!-- Rol eliminado (backend ya no provee esta propiedad) -->
+      <div class="author-section">
+        <span class="author">{{ comment.user }}</span>
+        <Tag
+          v-if="comment.role"
+          :value="comment.role"
+          :severity="roleSeverity"
+          class="role-badge"
+        />
+      </div>
     </div>
     <div class="card-content">
       <p class="text">"{{ comment.description }}"</p>
@@ -23,6 +30,7 @@
 <script setup>
 import { computed } from 'vue';
 import Button from 'primevue/button';
+import Tag from 'primevue/tag';
 import { useAuthStore } from '@/stores/auth.store.js';
 
 const props = defineProps({
@@ -40,6 +48,17 @@ const authStore = useAuthStore();
 const canEdit = computed(() => {
   const currentUser = authStore?.user?.username;
   return currentUser && props.comment?.user && currentUser === props.comment.user;
+});
+
+// Determina el severity del Tag según el rol
+const roleSeverity = computed(() => {
+  const role = props.comment?.role || '';
+  if (role.toLowerCase().includes('experto')) {
+    return 'success'; // Verde para expertos
+  } else if (role.toLowerCase().includes('novato')) {
+    return 'info'; // Azul para novatos
+  }
+  return 'secondary'; // Gris por defecto
 });
 
 // Formatea fecha ISO a DD/MM/YYYY; fallback a fecha actual si inválida
@@ -76,7 +95,14 @@ const formattedDate = computed(() => {
   margin-bottom: 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
+}
+
+.author-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .author {
@@ -85,6 +111,29 @@ const formattedDate = computed(() => {
   color: #2c3e50;
 }
 
+.role-badge {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+}
+
+:deep(.p-tag) {
+  border-radius: 20px;
+}
+
+:deep(.p-tag.p-tag-success) {
+  background-color: #10b981;
+  color: #fff;
+}
+
+:deep(.p-tag.p-tag-info) {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+:deep(.p-tag.p-tag-secondary) {
+  background-color: #9ca3af;
+  color: #fff;
+}
 
 .card-content {
   margin: 1rem 0;

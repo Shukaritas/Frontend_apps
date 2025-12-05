@@ -8,6 +8,7 @@ export class CommunityRecommendationAssembler {
     return new CommunityRecommendationDTO(
       entity.id,
       entity.user,
+      entity.role,
       entity.date,
       entity.description
     );

@@ -5,15 +5,17 @@
  *   id: number,
  *   userName: string,
  *   commentDate: string (ISO),
- *   comment: string
+ *   comment: string,
+ *   role: string (opcional)
  * }
  */
 export class CommunityRecommendation {
-  constructor(id, user, date, description) {
+  constructor(id, user, date, description, role = '') {
     this.id = id;
     this.user = user;
     this.date = date; // ISO or display string
     this.description = description;
+    this.role = role || ''; // Rol del usuario (ej: "Agricultor Experto")
   }
 
   static fromJSON(json) {
@@ -22,7 +24,8 @@ export class CommunityRecommendation {
       json.id,
       json.user || json.userName || json.author || 'Community',
       json.commentDate || json.CommentDate || json.date || json.Date || '',
-      json.comment || json.description || json.text || ''
+      json.comment || json.description || json.text || '',
+      json.role || json.Role || ''
     );
   }
 
@@ -31,7 +34,8 @@ export class CommunityRecommendation {
       id: this.id,
       user: this.user,
       date: this.date,
-      description: this.description
+      description: this.description,
+      role: this.role
     };
   }
 }
