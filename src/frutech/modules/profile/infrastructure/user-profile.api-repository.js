@@ -25,9 +25,11 @@ export class UserProfileApiRepository extends UserProfileRepository {
         const email = api.email ?? api.Email;
         const phoneNumber = api.phoneNumber ?? api.PhoneNumber;
         const identificator = api.identificator ?? api.Identificator;
-        const roleId = api.roleId ?? api.RoleId;
+        // Intenta leer roleId en diferentes formatos: camelCase, PascalCase, snake_case
+        const rawRoleId = api.roleId ?? api.RoleId ?? api.role_id;
+        const roleId = rawRoleId ? Number(rawRoleId) : 0;
         const password = '******';
-        return new UserProfile({ id: Number(id), name, email, phoneNumber, identificator, password, roleId: roleId ? Number(roleId) : undefined });
+        return new UserProfile({ id: Number(id), name, email, phoneNumber, identificator, password, roleId });
     }
 
     /**
