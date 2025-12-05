@@ -17,10 +17,17 @@
       "tasks": "No hay tareas próximas",
       "recommendations": "No hay recomendaciones por ahora"
     },
-    "genericRecommendations": {
-      "rec1": { "title": "Riego Consistente", "content": "Mantén niveles de humedad en el suelo para asegurar el crecimiento de raíces." },
-      "rec2": { "title": "Manejo de Plagas", "content": "Inspecciona las hojas regularmente para detectar signos de infestación." },
-      "rec3": { "title": "Nutrición del Suelo", "content": "Aplica compost orgánico estacionalmente para reponer nutrientes." }
+    "noviceRecommendations": {
+      "title": "Guía de Inicio",
+      "rec1": { "title": "Riego Básico", "content": "Riega tus plantas temprano en la mañana para evitar la evaporación y asegurar una absorción óptima." },
+      "rec2": { "title": "Identificación Visual", "content": "Aprende a reconocer hojas amarillas o marchitas como señales tempranas de problemas de riego o nutrientes." },
+      "rec3": { "title": "Calendario Simple", "content": "Lleva un registro básico de fechas de siembra y cosecha para planificar mejor tus actividades." }
+    },
+    "expertRecommendations": {
+      "title": "Consejos para Expertos",
+      "rec1": { "title": "Análisis de pH del Suelo", "content": "Realiza pruebas periódicas de pH y ajusta con enmiendas calcáreas o azufre según los requerimientos específicos de cada cultivo." },
+      "rec2": { "title": "Rotación de Cultivos Avanzada", "content": "Implementa un sistema de rotación cuatrienal que incluya leguminosas para fijar nitrógeno y mejorar la estructura del suelo." },
+      "rec3": { "title": "Manejo Integrado de Plagas", "content": "Utiliza trampas de feromonas y control biológico con enemigos naturales para reducir la dependencia de pesticidas químicos." }
     }
   },
   "sidebar": {

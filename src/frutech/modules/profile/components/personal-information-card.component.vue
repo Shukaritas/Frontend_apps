@@ -13,7 +13,7 @@
       <div class="field grid align-items-center">
         <label for="email" class="col-12 md:col-4">{{ t('profile.email') }}</label>
         <div class="col-12 md:col-8">
-          <!-- Email ahora editable en modo edición -->
+
           <InputText id="email" v-model="localProfile.email" class="w-full" :disabled="!isEditing" :invalid="!!errors.email" />
           <small v-if="errors.email" class="p-error">{{ t(errors.email) }}</small>
         </div>
@@ -30,7 +30,7 @@
       <div class="field grid align-items-center">
         <label for="doc" class="col-12 md:col-4">{{ t('profile.identityDocument') }}</label>
         <div class="col-12 md:col-8">
-          <!-- Campo de documento ahora siempre deshabilitado y sin validación visual -->
+
           <InputText id="doc" v-model="localProfile.identificator" class="w-full" disabled />
         </div>
       </div>

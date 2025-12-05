@@ -7,8 +7,8 @@ export class CommunityRecommendationDTO {
   constructor(id, user, role, date, description) {
     this.id = id;
     this.user = user;
-    this.role = role; // User role (e.g., "Agricultor Experto", "Agricultor Novato")
-    this.date = date; // formatted or ISO date string
+    this.role = role;
+    this.date = date;
     this.description = description;
   }
 }

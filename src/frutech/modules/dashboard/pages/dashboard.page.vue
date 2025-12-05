@@ -65,7 +65,7 @@
 
       <div class="col-12">
         <Card>
-          <template #title><h2 class="m-0 text-xl font-semibold">{{ $t('dashboard.recommendatios') }}</h2></template>
+          <template #title><h2 class="m-0 text-xl font-semibold">{{ recommendationsTitle }}</h2></template>
           <template #content>
             <div v-if="recommendations.length === 0">
               <Message severity="info" :closable="false">{{ $t('dashboard.emptySections.recommendations') }}</Message>
@@ -93,11 +93,12 @@ import Column from 'primevue/column';
 import Checkbox from 'primevue/checkbox';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-
+import { useAuthStore } from '@/stores/auth.store';
 import { FieldApiRepository } from '@/frutech/modules/my-fields/infrastructure/field.api-repository.js';
 import { TaskApiRepository } from '@/frutech/modules/my-tasks/infrastructure/task-api.repository.js';
 
 const router = useRouter();
+const authStore = useAuthStore();
 const fieldRepository = new FieldApiRepository();
 const taskRepository = new TaskApiRepository();
 const { t } = useI18n();
@@ -109,11 +110,23 @@ const userFields = ref([]);
 const upcomingTasks = ref([]);
 
 
-const recommendations = computed(() => [
-  { id: 1, title: t('dashboard.genericRecommendations.rec1.title'), content: t('dashboard.genericRecommendations.rec1.content') },
-  { id: 2, title: t('dashboard.genericRecommendations.rec2.title'), content: t('dashboard.genericRecommendations.rec2.content') },
-  { id: 3, title: t('dashboard.genericRecommendations.rec3.title'), content: t('dashboard.genericRecommendations.rec3.content') }
-]);
+const recommendationType = computed(() => {
+  const roleId = authStore.user?.roleId;
+  return roleId === 1 ? 'expertRecommendations' : 'noviceRecommendations';
+});
+
+
+const recommendationsTitle = computed(() => t(`dashboard.${recommendationType.value}.title`));
+
+
+const recommendations = computed(() => {
+  const type = recommendationType.value;
+  return [
+    { id: 1, title: t(`dashboard.${type}.rec1.title`), content: t(`dashboard.${type}.rec1.content`) },
+    { id: 2, title: t(`dashboard.${type}.rec2.title`), content: t(`dashboard.${type}.rec2.content`) },
+    { id: 3, title: t(`dashboard.${type}.rec3.title`), content: t(`dashboard.${type}.rec3.content`) }
+  ];
+});
 
 function getCurrentUserId() {
   try {
@@ -168,7 +181,7 @@ const goToMyTasks = () => {
   router.push('/my-tasks');
 };
 
-// Manejo de error de carga de imagen (fallback a placeholder)
+
 const handleImageError = (event) => {
   event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
 };
@@ -189,16 +202,15 @@ const handleImageError = (event) => {
   display: flex;
   gap: 1.5rem;
   overflow-x: auto;
-  padding-bottom: 1rem; /* Espacio para la barra de scroll */
+  padding-bottom: 1rem;
 }
 
-/* Ocultar barra de scroll pero mantener funcionalidad */
 .field-items-container::-webkit-scrollbar {
   display: none;
 }
 .field-items-container {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .field-item {

@@ -71,7 +71,6 @@
           @cancel="onCancelForm"
         />
 
-        <!-- Toast for notifications -->
         <Toast />
   </div>
 </template>

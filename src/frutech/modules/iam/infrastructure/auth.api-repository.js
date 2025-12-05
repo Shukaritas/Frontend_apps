@@ -41,7 +41,7 @@ function extractIdFromClaims(claims) {
 function isValidId(id) {
   if (id === undefined || id === null) return false;
   if (typeof id === 'number') return Number.isFinite(id);
-  if (typeof id === 'string') return id.trim().length > 0; // acepta UUID o string no vacío
+  if (typeof id === 'string') return id.trim().length > 0;
   return false;
 }
 

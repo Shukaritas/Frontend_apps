@@ -60,14 +60,14 @@ export class CropApiRepository extends CropRepository {
      */
     domainToApi(domainData) {
         return {
-            fieldId: Number(domainData.fieldId), // DEBE ser número
-            crop: domainData.title, // El backend espera "crop", no "cropType"
+            fieldId: Number(domainData.fieldId),
+            crop: domainData.title,
             soilType: domainData.soilType || '',
             sunlight: domainData.sunlight || '',
             watering: domainData.watering || '',
             status: domainData.status,
-            plantingDate: convertToISODate(domainData.planting_date), // Convertir a ISO
-            harvestDate: convertToISODate(domainData.harvest_date) // Convertir a ISO
+            plantingDate: convertToISODate(domainData.planting_date),
+            harvestDate: convertToISODate(domainData.harvest_date)
         };
     }
 

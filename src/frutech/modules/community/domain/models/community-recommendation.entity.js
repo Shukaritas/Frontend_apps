@@ -13,9 +13,9 @@ export class CommunityRecommendation {
   constructor(id, user, date, description, role = '') {
     this.id = id;
     this.user = user;
-    this.date = date; // ISO or display string
+    this.date = date;
     this.description = description;
-    this.role = role || ''; // Rol del usuario (ej: "Agricultor Experto")
+    this.role = role || '';
   }
 
   static fromJSON(json) {

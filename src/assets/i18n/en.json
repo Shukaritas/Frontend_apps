@@ -17,10 +17,17 @@
       "unauthenticated": "User not authenticated",
       "loadFailed": "Error loading dashboard data"
     },
-    "genericRecommendations": {
-      "rec1": { "title": "Consistent Irrigation", "content": "Maintain soil moisture levels to ensure healthy root growth." },
-      "rec2": { "title": "Pest Management", "content": "Inspect leaves regularly for early signs of infestation." },
-      "rec3": { "title": "Soil Nutrition", "content": "Apply organic compost seasonally to replenish nutrients." }
+    "noviceRecommendations": {
+      "title": "Getting Started Guide",
+      "rec1": { "title": "Basic Watering", "content": "Water your plants early in the morning to prevent evaporation and ensure optimal absorption." },
+      "rec2": { "title": "Visual Identification", "content": "Learn to recognize yellow or wilted leaves as early signs of watering or nutrient problems." },
+      "rec3": { "title": "Simple Calendar", "content": "Keep a basic record of planting and harvest dates to better plan your activities." }
+    },
+    "expertRecommendations": {
+      "title": "Expert Tips",
+      "rec1": { "title": "Soil pH Analysis", "content": "Perform periodic pH tests and adjust with lime or sulfur amendments according to specific crop requirements." },
+      "rec2": { "title": "Advanced Crop Rotation", "content": "Implement a four-year rotation system that includes legumes to fix nitrogen and improve soil structure." },
+      "rec3": { "title": "Integrated Pest Management", "content": "Use pheromone traps and biological control with natural enemies to reduce reliance on chemical pesticides." }
     }
   },
   "sidebar": {

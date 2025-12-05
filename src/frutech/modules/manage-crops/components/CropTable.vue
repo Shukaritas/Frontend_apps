@@ -1,19 +1,19 @@
 <template>
   <div class="crop-table-container">
-    <!-- Loading State -->
+
     <div v-if="isLoading" class="loading-container">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
       <p>{{ $t('manageCrops.loadingCrops') }}</p>
     </div>
 
-    <!-- Error State -->
+
     <div v-else-if="error" class="error-container">
       <i class="pi pi-exclamation-triangle" style="font-size: 2rem; color: #e74c3c"></i>
       <p>{{ error }}</p>
       <Button @click="$emit('retry')" :label="$t('manageCrops.retry')" severity="secondary" />
     </div>
 
-    <!-- Table Content -->
+
     <div v-else>
       <DataTable 
         :value="crops" 
@@ -97,7 +97,7 @@
       </div>
     </div>
 
-    <!-- Delete Confirmation Dialog -->
+
     <Dialog 
       v-model:visible="deleteDialog" 
       :style="{width: '450px'}" 
@@ -160,7 +160,7 @@ function formatDate(value, mode = 'DMY') {
       return mode === 'DMY' ? `${dd}/${mm}/${yy}` : `${yy}-${mm}-${dd}`;
     }
   } catch {}
-  return datePart; // fallback
+  return datePart;
 }
 
 const props = defineProps({

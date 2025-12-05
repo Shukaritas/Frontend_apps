@@ -54,7 +54,7 @@ export const useCropStore = defineStore('crop', () => {
                 planting_date: cropData.planting_date,
                 harvest_date: cropData.harvest_date,
                 field: cropData.field,
-                fieldId: cropData.fieldId, // ID numérico del campo
+                fieldId: cropData.fieldId,
                 status: cropData.status,
                 days: cropData.days,
                 soilType: cropData.soilType || '',

@@ -21,12 +21,11 @@ export class User {
         if (!this.password || this.password.length < 6) {
             throw new Error('La contraseña debe tener al menos 6 caracteres.');
         }
-        // Validación: DNI tenga 8 números
+
         if (!/^\d{8}$/.test(this.identificator)) {
             throw new Error('El DNI debe tener exactamente 8 números.');
         }
-        // Validación: Número tenga siempre un + (formato internacional)
-        // Regex simple: Empieza con + seguido de dígitos
+
         if (!/^\+\d+/.test(this.phoneNumber)) {
             throw new Error('El teléfono debe incluir el código de país con "+" (ej. +51999999999).');
         }

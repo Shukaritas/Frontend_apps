@@ -111,7 +111,6 @@ import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import Button from 'primevue/button';
 
-// Helper para formatear fechas a DD/MM/YYYY (o retornar YYYY-MM-DD si se requiere)
 function formatDate(value, mode = 'DMY') {
   if (!value) return '';
   let datePart = String(value);

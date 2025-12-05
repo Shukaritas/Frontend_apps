@@ -161,8 +161,9 @@ const confirmDelete = () => {
     accept: async () => {
       try {
         await userProfileStore.deleteAccount();
+        authStore.logout();
         toast.add({ severity: 'success', summary: 'Success', detail: t('toast.accountDeleted'), life: 3000 });
-        router.push('/login');
+        router.push('/register');
       } catch (err) {
         toast.add({ severity: 'error', summary: 'Error', detail: t('toast.errorDeleteAccount'), life: 3000 });
       }

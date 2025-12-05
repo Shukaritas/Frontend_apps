@@ -27,7 +27,7 @@ function validateCrop({ id, title, planting_date, harvest_date, field, fieldId, 
             throw new Error('Field must be at least 2 characters long.');
         }
     } else {
-        // Si hay fieldId, field puede ser cualquier string (incluso genérico como "Field #1")
+
         if (field !== undefined && field !== null && typeof field !== 'string') {
             throw new Error('Field must be a string.');
         }
@@ -36,7 +36,7 @@ function validateCrop({ id, title, planting_date, harvest_date, field, fieldId, 
     if (fieldId !== undefined && fieldId !== null && typeof fieldId !== 'number') throw new Error('Field ID must be a number.');
     if (typeof status !== 'string' || status.length === 0) throw new Error('Status is required.');
     if (typeof days !== 'string' || days.length === 0) throw new Error('Days is required.');
-    // soilType, sunlight, watering son opcionales, no los validamos estrictamente
+
 }
 
 /**

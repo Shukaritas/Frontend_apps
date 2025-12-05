@@ -3,7 +3,7 @@ import { DashboardData } from '../domain/models/dashboard.model';
 import { FieldApiRepository } from '@/frutech/modules/my-fields/infrastructure/field.api-repository.js';
 import { TaskApiRepository } from '@/frutech/modules/my-tasks/infrastructure/task-api.repository.js';
 
-// Recomendaciones estáticas (se evita consumo API real para Community)
+
 const STATIC_RECOMMENDATIONS = [
   { id: 1, user: 'AgroExpert', role: 'Especialista', description: 'Optimiza riego temprano para mejorar retención de nutrientes.' },
   { id: 2, user: 'SoilGuru', role: 'Analista Suelos', description: 'Añade compost orgánico en parcelas con menor humedad.' },
@@ -22,7 +22,6 @@ export class DashboardApiRepository extends DashboardRepository {
       const fieldRepo = new FieldApiRepository();
       const taskRepo = new TaskApiRepository();
 
-      // 1) Campos para preview
       const fields = await fieldRepo.getAll();
       const previewFields = (fields || []).slice(0, 4).map(f => ({
         id: f.id,
@@ -31,9 +30,8 @@ export class DashboardApiRepository extends DashboardRepository {
         location: f.location,
       }));
 
-      // 2) Tareas próximas: consumir API real /api/Tasks y filtrar por fecha si es necesario
       const rawTasks = await taskRepo.getAll();
-      // taskRepo devuelve Task domain con dueDate en formato DD/MM; para ordenar, convertimos a Date usando año actual
+
       const upcomingTasks = (rawTasks || [])
         .map(t => {
           const [day, month] = String(t.dueDate || '').split('/').map(Number);
