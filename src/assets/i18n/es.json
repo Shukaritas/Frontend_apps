@@ -249,14 +249,11 @@
       "email": "Email",
       "emailPlaceholder": "ejemplo{'@'}correo.com",
       "password": "Contraseña",
-      "role": "Nivel de Experiencia",
-      "rolePlaceholder": "Selecciona tu perfil",
       "submit": "Crear cuenta",
       "loading": "Registrando...",
       "haveAccount": "¿Ya tienes cuenta?",
       "goLogin": "Inicia sesión",
-      "success": "¡Cuenta creada con éxito! Redirigiendo al login...",
-      "roleRequired": "Por favor selecciona tu nivel de experiencia"
+      "success": "¡Cuenta creada con éxito! Redirigiendo al login..."
     }
   }
 }

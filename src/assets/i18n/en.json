@@ -249,14 +249,11 @@
       "email": "Email",
       "emailPlaceholder": "example{'@'}mail.com",
       "password": "Password",
-      "role": "Experience Level",
-      "rolePlaceholder": "Select your profile",
       "submit": "Create account",
       "loading": "Registering...",
       "haveAccount": "Already have an account?",
       "goLogin": "Sign in",
-      "success": "Account created successfully! Redirecting to login...",
-      "roleRequired": "Please select your experience level"
+      "success": "Account created successfully! Redirecting to login..."
     }
   }
 }

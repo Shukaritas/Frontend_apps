@@ -36,16 +36,6 @@
           <input v-model="form.password" type="password" required />
         </label>
 
-        <label>
-          <span>{{ $t('iam.register.role') }}</span>
-          <select v-model="selectedRole" required class="role-select">
-            <option :value="null" disabled>{{ $t('iam.register.rolePlaceholder') }}</option>
-            <option v-for="role in roles" :key="role.id" :value="role">
-              {{ role.name }}
-            </option>
-          </select>
-        </label>
-
         <button type="submit" :disabled="loading">
           {{ loading ? $t('iam.register.loading') : $t('iam.register.submit') }}
         </button>
@@ -85,37 +75,19 @@ const form = reactive({
   identificator: '',
   phoneNumber: '',
   email: '',
-  password: '',
-  roleId: null
+  password: ''
 });
-
-// Selector de rol
-const selectedRole = ref(null);
-const roles = ref([
-  { name: 'Agricultor Novato', id: 1 },
-  { name: 'Agricultor Experto', id: 2 }
-]);
 
 const validateNumberInput = (event) => {
   form.identificator = event.target.value.replace(/\D/g, '');
 };
 
 const handleRegister = async () => {
-
   authStore.error = null;
-  if (!selectedRole.value) {
-    authStore.error = t('iam.register.roleRequired');
-    return;
-  }
   loading.value = true;
 
-  // Incluir roleId en el objeto de registro
-  const registrationData = {
-    ...form,
-    roleId: selectedRole.value.id
-  };
 
-  const success = await authStore.register(registrationData);
+  const success = await authStore.register(form);
   loading.value = false;
 
   if (success) {
@@ -183,8 +155,7 @@ const handleRegister = async () => {
   font-weight: 500;
 }
 
-.auth-form input,
-.auth-form select {
+.auth-form input {
   padding: 10px 12px;
   border: 1px solid #d8e8d8;
   border-radius: 10px;
@@ -194,18 +165,9 @@ const handleRegister = async () => {
   font-family: inherit;
 }
 
-.auth-form input:focus,
-.auth-form select:focus {
+.auth-form input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(36, 95, 53, 0.15);
-}
-
-.auth-form select {
-  cursor: pointer;
-}
-
-.auth-form select option {
-  padding: 8px;
 }
 
 .auth-form button {
