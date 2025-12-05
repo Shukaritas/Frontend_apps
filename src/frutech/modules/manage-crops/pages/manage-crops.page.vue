@@ -1,5 +1,6 @@
 <template>
   <div class="manage-crops-page">
+        <!-- Header Section -->
         <div class="page-header">
           <h1 class="page-title">{{ $t('manageCrops.title') }}</h1>
           <p class="page-description">
@@ -7,6 +8,7 @@
           </p>
         </div>
 
+        <!-- Statistics Cards -->
         <div class="stats-container">
           <div class="stat-card">
             <div class="stat-icon">
@@ -49,6 +51,7 @@
           </div>
         </div>
 
+        <!-- Crops Table -->
         <CropTable
           :crops="cropStore.crops"
           :is-loading="cropStore.isLoading"
@@ -59,6 +62,7 @@
           @retry="onRetry"
         />
 
+        <!-- Crop Form Dialog -->
         <CropForm
           v-model:visible="showCropForm"
           :crop="selectedCrop"
@@ -67,6 +71,7 @@
           @cancel="onCancelForm"
         />
 
+        <!-- Toast for notifications -->
         <Toast />
   </div>
 </template>

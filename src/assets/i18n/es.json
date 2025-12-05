@@ -16,9 +16,13 @@
       "fields": "Aún no tienes campos registrados",
       "tasks": "No hay tareas próximas",
       "recommendations": "No hay recomendaciones por ahora"
+    },
+    "genericRecommendations": {
+      "rec1": { "title": "Riego Consistente", "content": "Mantén niveles de humedad en el suelo para asegurar el crecimiento de raíces." },
+      "rec2": { "title": "Manejo de Plagas", "content": "Inspecciona las hojas regularmente para detectar signos de infestación." },
+      "rec3": { "title": "Nutrición del Suelo", "content": "Aplica compost orgánico estacionalmente para reponer nutrientes." }
     }
   },
-
   "sidebar": {
     "dashboard": "Panel de Control",
     "manageCrops": "Gestionar Cultivos",
@@ -227,7 +231,7 @@
     "login": {
       "title": "Iniciar sesión",
       "email": "Email",
-      "emailPlaceholder": "ejemplo@correo.com",
+      "emailPlaceholder": "ejemplo{'@'}correo.com",
       "password": "Contraseña",
       "submit": "Iniciar sesión",
       "loading": "Cargando...",
@@ -243,13 +247,16 @@
       "phone": "Teléfono (con código de país)",
       "phonePlaceholder": "+51999999999",
       "email": "Email",
-      "emailPlaceholder": "ejemplo@correo.com",
+      "emailPlaceholder": "ejemplo{'@'}correo.com",
       "password": "Contraseña",
+      "role": "Nivel de Experiencia",
+      "rolePlaceholder": "Selecciona tu perfil",
       "submit": "Crear cuenta",
       "loading": "Registrando...",
       "haveAccount": "¿Ya tienes cuenta?",
       "goLogin": "Inicia sesión",
-      "success": "¡Cuenta creada con éxito! Redirigiendo al login..."
+      "success": "¡Cuenta creada con éxito! Redirigiendo al login...",
+      "roleRequired": "Por favor selecciona tu nivel de experiencia"
     }
   }
 }

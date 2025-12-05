@@ -7,6 +7,11 @@ import { Crop } from '../domain/models/crop.model';
 const repository = new CropApiRepository();
 const assembler = new CropAssembler();
 
+/**
+ * @store useCropStore
+ * @description Pinia store to manage crop state and actions.
+ * @author Jefferson Castro
+ */
 export const useCropStore = defineStore('crop', () => {
     const crops = ref([]);
     const isLoading = ref(false);
@@ -14,6 +19,9 @@ export const useCropStore = defineStore('crop', () => {
 
     const hasCrops = computed(() => crops.value.length > 0);
 
+    /**
+     * Fetches all crops from the API and saves them to the state.
+     */
     async function fetchCrops() {
         isLoading.value = true;
         error.value = null;
@@ -29,6 +37,10 @@ export const useCropStore = defineStore('crop', () => {
         }
     }
 
+    /**
+     * Creates a new crop.
+     * @param {object} cropData - Object with crop data (title, planting_date, harvest_date, field, fieldId, status, days, soilType, sunlight, watering).
+     */
     async function createCrop(cropData) {
         isLoading.value = true;
         error.value = null;
@@ -42,7 +54,7 @@ export const useCropStore = defineStore('crop', () => {
                 planting_date: cropData.planting_date,
                 harvest_date: cropData.harvest_date,
                 field: cropData.field,
-                fieldId: cropData.fieldId,
+                fieldId: cropData.fieldId, // ID numérico del campo
                 status: cropData.status,
                 days: cropData.days,
                 soilType: cropData.soilType || '',
@@ -61,6 +73,11 @@ export const useCropStore = defineStore('crop', () => {
         }
     }
 
+    /**
+     * Updates an existing crop.
+     * @param {number} cropId - The ID of the crop to update.
+     * @param {object} cropData - Object with updated crop data.
+     */
     async function updateCrop(cropId, cropData) {
         isLoading.value = true;
         error.value = null;
@@ -80,6 +97,7 @@ export const useCropStore = defineStore('crop', () => {
             );
             
             await repository.update(currentEntity);
+
             await fetchCrops();
         } catch (err) {
             error.value = 'Could not update crop.';
@@ -90,14 +108,42 @@ export const useCropStore = defineStore('crop', () => {
         }
     }
 
+    /**
+     * Deletes a crop.
+     * @param {number} cropId - The ID of the crop to delete.
+     */
     async function deleteCrop(cropId) {
         isLoading.value = true;
         error.value = null;
         try {
             await repository.delete(cropId);
-            await fetchCrops();
+            crops.value = crops.value.filter(crop => crop.id !== cropId);
         } catch (err) {
             error.value = 'Could not delete crop.';
+            console.error(err);
+            throw err;
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+    /**
+     * Updates the status of a crop.
+     * @param {number} cropId - The ID of the crop.
+     * @param {string} newStatus - The new status.
+     */
+    async function updateCropStatus(cropId, newStatus) {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            const currentEntity = await repository.getById(cropId);
+            currentEntity.updateStatus(newStatus);
+            
+            await repository.update(currentEntity);
+
+            await fetchCrops();
+        } catch (err) {
+            error.value = 'Could not update crop status.';
             console.error(err);
             throw err;
         } finally {
@@ -113,6 +159,7 @@ export const useCropStore = defineStore('crop', () => {
         fetchCrops,
         createCrop,
         updateCrop,
-        deleteCrop
+        deleteCrop,
+        updateCropStatus
     };
 });

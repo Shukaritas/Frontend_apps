@@ -170,6 +170,7 @@ const saveProgress = async () => {
 };
 
 const saveTask = async () => {
+  // Validar que la descripción tenga al menos 3 caracteres
   if (!newTaskData.task || newTaskData.task.trim().length < 3) {
     toast.add({
       severity: 'warn',

@@ -9,6 +9,7 @@
     </div>
 
     <div v-else class="grid gap-4">
+
       <div class="col-12">
         <Card class="preview-fields-card">
           <template #title>
@@ -66,7 +67,7 @@
         <Card>
           <template #title><h2 class="m-0 text-xl font-semibold">{{ $t('dashboard.recommendatios') }}</h2></template>
           <template #content>
-            <div v-if="recommendations.length === 0" class="p-3">
+            <div v-if="recommendations.length === 0">
               <Message severity="info" :closable="false">{{ $t('dashboard.emptySections.recommendations') }}</Message>
             </div>
             <div v-else>
@@ -82,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Card from 'primevue/card';
 import Button from 'primevue/button';
 import ProgressSpinner from 'primevue/progressspinner';
@@ -106,7 +107,13 @@ const error = ref(null);
 
 const userFields = ref([]);
 const upcomingTasks = ref([]);
-const recommendations = ref([]);
+
+
+const recommendations = computed(() => [
+  { id: 1, title: t('dashboard.genericRecommendations.rec1.title'), content: t('dashboard.genericRecommendations.rec1.content') },
+  { id: 2, title: t('dashboard.genericRecommendations.rec2.title'), content: t('dashboard.genericRecommendations.rec2.content') },
+  { id: 3, title: t('dashboard.genericRecommendations.rec3.title'), content: t('dashboard.genericRecommendations.rec3.content') }
+]);
 
 function getCurrentUserId() {
   try {
@@ -125,15 +132,18 @@ async function fetchDashboardData() {
     const userId = getCurrentUserId();
     if (!userId) throw new Error(t('dashboard.errors.unauthenticated'));
 
+
     const fields = await fieldRepository.getAll();
     userFields.value = Array.isArray(fields)
       ? fields.map(f => ({ id: f.id, name: f.name, imageUrl: f.imageUrl }))
       : [];
 
+
     const tasks = await taskRepository.getUpcomingTasks(userId, 3);
     upcomingTasks.value = Array.isArray(tasks) ? tasks.map(t => ({
       id: t.id,
       description: t.description,
+
       dueDate: t.dueDate,
       field: t.field,
       completed: t.completed
@@ -158,6 +168,7 @@ const goToMyTasks = () => {
   router.push('/my-tasks');
 };
 
+// Manejo de error de carga de imagen (fallback a placeholder)
 const handleImageError = (event) => {
   event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
 };
@@ -178,15 +189,16 @@ const handleImageError = (event) => {
   display: flex;
   gap: 1.5rem;
   overflow-x: auto;
-  padding-bottom: 1rem;
+  padding-bottom: 1rem; /* Espacio para la barra de scroll */
 }
 
+/* Ocultar barra de scroll pero mantener funcionalidad */
 .field-items-container::-webkit-scrollbar {
   display: none;
 }
 .field-items-container {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 .field-item {

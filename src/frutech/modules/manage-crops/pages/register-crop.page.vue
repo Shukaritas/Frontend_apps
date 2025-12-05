@@ -112,7 +112,7 @@ onMounted(async () => {
   try {
     await fieldStore.fetchFields();
     previewFieldsWithStatus.value = (fieldStore.fields || []).map(f => {
-      const rawCropName = f.cropName || f.crop || '';
+      const rawCropName = f.cropName || f.crop || ''; // diferentes fuentes
       const hasCrop = rawCropName && rawCropName.trim() !== '' && rawCropName !== 'Sin Cultivo' && rawCropName !== '—';
       return {
         id: f.id,

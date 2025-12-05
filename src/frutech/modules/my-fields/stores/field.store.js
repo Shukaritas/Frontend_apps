@@ -4,6 +4,11 @@ import { FieldApiRepository } from '../infrastructure/field.api-repository.js';
 import { useDashboardStore } from '@/frutech/modules/dashboard/stores/dashboard.store.js';
 import { useAuthStore } from '@/stores/auth.store.js';
 
+/**
+ * Convierte fecha DD/MM a formato ISO YYYY-MM-DD usando el año actual
+ * @param {string} dateStr - Fecha en formato DD/MM
+ * @returns {string} Fecha en formato ISO YYYY-MM-DD
+ */
 function convertShortDateToISO(dateStr) {
   if (!dateStr || typeof dateStr !== 'string') {
     return new Date().toISOString().split('T')[0];
@@ -48,22 +53,23 @@ export const useFieldStore = defineStore('fields', () => {
       const allFields = await fieldRepository.getAll();
       fields.value = allFields;
     } catch (e) {
-      error.value = 'No se pudieron cargar los campos.';
+      error.value = 'Could not load fields.';
       console.error(e);
       fields.value = [];
     } finally {
       isLoading.value = false;
     }
   }
+
   async function fetchFieldById(id) {
     isLoading.value = true;
     error.value = null;
     currentField.value = null;
     try {
       currentField.value = await fieldRepository.getById(id);
-      if (!currentField.value) throw new Error('Campo no encontrado');
+      if (!currentField.value) throw new Error('Field not found');
     } catch (e) {
-      error.value = 'No se pudo cargar la información del campo.';
+      error.value = 'Could not load field information.';
       console.error(e);
       currentField.value = null;
     } finally {
@@ -90,24 +96,37 @@ export const useFieldStore = defineStore('fields', () => {
 
       const dashboardStore = useDashboardStore();
       dashboardStore.fetchDashboardData();
-
     } catch (e) {
-      error.value = 'No se pudo crear el campo.';
+      error.value = 'No se pudo guardar el campo.';
       console.error(e);
       throw e;
     } finally {
       isLoading.value = false;
     }
   }
-
-  async function updateFieldProgress(fieldId, progressData) {
+  async function updateFieldProgress(fieldId, newProgress) {
     isLoading.value = true;
     error.value = null;
     try {
-      await fieldRepository.addProgress(fieldId, progressData);
+      if (!currentField.value || currentField.value.id !== fieldId) {
+        await fetchFieldById(fieldId);
+      }
+
+      const progressHistoryId = currentField.value.progressHistoryId;
+
+      if (!progressHistoryId) {
+        throw new Error('No se encontró un registro de progreso para actualizar');
+      }
+
+      await fieldRepository.updateProgress(progressHistoryId, {
+        watered: newProgress.watered ?? false,
+        fertilized: newProgress.fertilized ?? false,
+        pests: newProgress.pests ?? false
+      });
+
       await fetchFieldById(fieldId);
     } catch (e) {
-      error.value = 'No se pudo actualizar el progreso.';
+      error.value = 'No se pudo actualizar el progreso del campo.';
       console.error(e);
       throw e;
     } finally {
@@ -119,15 +138,53 @@ export const useFieldStore = defineStore('fields', () => {
     isLoading.value = true;
     error.value = null;
     try {
+      const isoDate = convertShortDateToISO(taskData.date);
+
       const payload = {
-        ...taskData,
-        dueDate: convertShortDateToISO(taskData.date),
         fieldId: fieldId,
+        description: taskData.task,
+        dueDate: isoDate
       };
-      await fieldRepository.addTask(payload);
-      await fetchFieldById(fieldId);
+
+      const newTaskFromBackend = await fieldRepository.addNewTask(payload);
+
+      if (currentField.value) {
+        const currentTasks = currentField.value.tasks || [];
+
+        const newTaskForView = {
+          id: newTaskFromBackend.id ?? newTaskFromBackend.Id,
+          description: newTaskFromBackend.description ?? newTaskFromBackend.Description,
+          dueDate: newTaskFromBackend.dueDate ?? newTaskFromBackend.DueDate,
+          date: taskData.date,
+          completed: newTaskFromBackend.completed ?? newTaskFromBackend.Completed ?? false,
+          name: taskData.name,
+          task: taskData.task
+        };
+
+        currentField.value = {
+          ...currentField.value,
+          tasks: [...currentTasks, newTaskForView]
+        };
+      }
     } catch (e) {
       error.value = 'No se pudo agregar la tarea.';
+      console.error(e);
+      throw e;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function updateFieldCropInfo(fieldId, cropData) {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      await fieldRepository.updateField(fieldId, cropData);
+      if (currentField.value && currentField.value.id === fieldId) {
+        currentField.value = { ...currentField.value, ...cropData };
+      }
+    } catch (e) {
+      error.value = 'No se pudo actualizar la información del cultivo en el campo.';
       console.error(e);
       throw e;
     } finally {
@@ -145,5 +202,6 @@ export const useFieldStore = defineStore('fields', () => {
     createField,
     updateFieldProgress,
     addTaskToField,
+    updateFieldCropInfo
   };
 });

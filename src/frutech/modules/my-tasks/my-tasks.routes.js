@@ -1,3 +1,6 @@
+/**
+ * Routes configuration for the My Tasks module.
+ */
 export const myTasksRoutes = [
   {
     path: '/my-tasks',

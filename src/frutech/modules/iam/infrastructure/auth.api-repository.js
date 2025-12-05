@@ -41,44 +41,98 @@ function extractIdFromClaims(claims) {
 function isValidId(id) {
   if (id === undefined || id === null) return false;
   if (typeof id === 'number') return Number.isFinite(id);
-  if (typeof id === 'string') return id.trim().length > 0;
+  if (typeof id === 'string') return id.trim().length > 0; // acepta UUID o string no vacío
   return false;
 }
 
 export class AuthApiRepository {
-  async login(credentials) {
-    const endpoint = `${USERS_ENDPOINT}/sign-in`;
-    const response = await http.post(endpoint, credentials);
-    const data = response.data;
+  /**
+   * Authenticates a user against the .NET 9 API.
+   * Endpoint: POST /api/v1/users/sign-in
+   */
+  async login(email, password) {
+    try {
+      const resp = await http.post(`${USERS_ENDPOINT}/sign-in`, { email, password });
+      let data = resp?.data;
 
-    const token = findJwtInObject(data);
-    if (!token) throw new Error('Token no encontrado en la respuesta');
+      if (typeof data === 'string') {
+        const token = data;
+        const claims = decodeJwtClaims(token);
+        const idFromJwt = extractIdFromClaims(claims);
+        if (!isValidId(idFromJwt)) throw new Error('La respuesta de login no incluye un ID de usuario válido.');
+        const user = new User({ id: idFromJwt, username: claims.unique_name || '', email, password: '******', phoneNumber: '+000000000', identificator: '00000000' });
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify({ id: user.id, username: user.username, email: user.email }));
+        return user;
+      }
 
-    const claims = decodeJwtClaims(token);
-    const id = extractIdFromClaims(claims);
-    if (!isValidId(id)) throw new Error('ID de usuario inválido en el token');
+      const body = data && typeof data === 'object' && data.data && typeof data.data === 'object' ? data.data : (data || {});
 
-    const username = getCI(claims, 'username') || getCI(claims, 'name') || 'Unknown';
-    const role = getCI(claims, 'role') || 'USER';
+      const keyList = Object.keys(body || {});
+      const tokenKey = keyList.find(k => ['token','accesstoken','access_token','jwt','jwttoken','bearertoken','authenticationtoken','value'].includes(k.toLowerCase()));
+      let token = tokenKey ? body[tokenKey] : undefined;
 
-    return { user: new User(id, username, role), token };
+      if (!token) token = getCI(getCI(body, 'result') || {}, 'token') || getCI(getCI(body, 'signInResponse') || {}, 'token') || getCI(getCI(body, 'response') || {}, 'token') || getCI(getCI(body, 'user') || {}, 'token');
+
+      if (!token) {
+        const authHeader = resp?.headers?.authorization || resp?.headers?.Authorization;
+        if (typeof authHeader === 'string' && authHeader.toLowerCase().startsWith('bearer ')) {
+          token = authHeader.slice(7);
+        }
+      }
+
+      if (!token) token = findJwtInObject(body);
+
+      const userBody = (getCI(body, 'user') && typeof getCI(body, 'user') === 'object') ? getCI(body, 'user') : body;
+      let id = getCI(userBody, 'id') ?? getCI(userBody, 'userId') ?? getCI(userBody, 'user_id');
+
+      if (!isValidId(id) && token) {
+        const claims = decodeJwtClaims(token);
+        const idFromJwt = extractIdFromClaims(claims);
+        if (isValidId(idFromJwt)) id = idFromJwt;
+      }
+
+      if (!isValidId(id)) {
+        const backendMessage = getCI(body, 'message') || getCI(body, 'error') || getCI(body, 'detail') || getCI(body, 'title');
+        throw new Error(backendMessage || 'La respuesta de login no incluye un ID de usuario válido.');
+      }
+
+      const username = getCI(userBody, 'userName') ?? getCI(userBody, 'username') ?? getCI(userBody, 'name') ?? '';
+      const emailResp = getCI(userBody, 'email') ?? email;
+      const phoneNumberRaw = getCI(userBody, 'phoneNumber');
+      const identificatorRaw = getCI(userBody, 'identificator');
+      const phoneNumber = typeof phoneNumberRaw === 'string' && /^\+\d+/.test(phoneNumberRaw) ? phoneNumberRaw : '+000000000';
+      const identificator = typeof identificatorRaw === 'string' && /^\d{8}$/.test(identificatorRaw) ? identificatorRaw : '00000000';
+
+      const user = new User({ id, username, email: emailResp, password: '******', phoneNumber, identificator });
+
+      if (token) localStorage.setItem('token', token); else localStorage.removeItem('token');
+      localStorage.setItem('user', JSON.stringify({ id: user.id, username: user.username, email: user.email }));
+      return user;
+    } catch (error) {
+      throw new Error(error.message || 'Error al iniciar sesión');
+    }
   }
 
-  async register(userData) {
-    const endpoint = `${USERS_ENDPOINT}/sign-up`;
-    const response = await http.post(endpoint, userData);
-    const data = response.data;
-
-    const token = findJwtInObject(data);
-    if (!token) throw new Error('Token no encontrado en la respuesta');
-
-    const claims = decodeJwtClaims(token);
-    const id = extractIdFromClaims(claims);
-    if (!isValidId(id)) throw new Error('ID de usuario inválido en el token');
-
-    const username = getCI(claims, 'username') || getCI(claims, 'name') || userData.username;
-    const role = getCI(claims, 'role') || 'USER';
-
-    return { user: new User(id, username, role), token };
+  /**
+   * Registro de usuario.
+   * Endpoint: POST /api/v1/users/sign-up via baseURL /api
+   */
+  async register({ username, email, phoneNumber, identificator, password, roleId }) {
+      try {
+          if (!email || !password) throw new Error('Email y password son requeridos');
+          const payload = {
+              userName: username,
+              email,
+              phoneNumber,
+              identificator,
+              password,
+              roleId
+          };
+          const response = await http.post(`${USERS_ENDPOINT}/sign-up`, payload);
+          return response.data;
+      } catch (error) {
+          throw new Error(error.message || 'Error en el registro');
+      }
   }
 }

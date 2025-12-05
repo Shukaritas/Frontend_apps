@@ -1,3 +1,9 @@
+/**
+ * @file Main entry point for the Vue application.
+ * @description This file initializes the Vue app, Pinia for state management, Vue Router,
+ * Vue I18n for internationalization, and PrimeVue for UI components, along with its services.
+ * It also imports global styles.
+ */
 
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';

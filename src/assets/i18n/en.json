@@ -16,9 +16,13 @@
     "errors": {
       "unauthenticated": "User not authenticated",
       "loadFailed": "Error loading dashboard data"
+    },
+    "genericRecommendations": {
+      "rec1": { "title": "Consistent Irrigation", "content": "Maintain soil moisture levels to ensure healthy root growth." },
+      "rec2": { "title": "Pest Management", "content": "Inspect leaves regularly for early signs of infestation." },
+      "rec3": { "title": "Soil Nutrition", "content": "Apply organic compost seasonally to replenish nutrients." }
     }
   },
-
   "sidebar": {
     "dashboard": "Dashboard",
     "manageCrops": "Manage Crops",
@@ -227,7 +231,7 @@
     "login": {
       "title": "Sign in",
       "email": "Email",
-      "emailPlaceholder": "example@mail.com",
+      "emailPlaceholder": "example{'@'}mail.com",
       "password": "Password",
       "submit": "Sign in",
       "loading": "Loading...",
@@ -243,13 +247,16 @@
       "phone": "Phone (with country code)",
       "phonePlaceholder": "+19999999999",
       "email": "Email",
-      "emailPlaceholder": "example@mail.com",
+      "emailPlaceholder": "example{'@'}mail.com",
       "password": "Password",
+      "role": "Experience Level",
+      "rolePlaceholder": "Select your profile",
       "submit": "Create account",
       "loading": "Registering...",
       "haveAccount": "Already have an account?",
       "goLogin": "Sign in",
-      "success": "Account created successfully! Redirecting to login..."
+      "success": "Account created successfully! Redirecting to login...",
+      "roleRequired": "Please select your experience level"
     }
   }
 }

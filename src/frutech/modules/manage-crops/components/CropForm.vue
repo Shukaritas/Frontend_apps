@@ -111,6 +111,7 @@ import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import Button from 'primevue/button';
 
+// Helper para formatear fechas a DD/MM/YYYY (o retornar YYYY-MM-DD si se requiere)
 function formatDate(value, mode = 'DMY') {
   if (!value) return '';
   let datePart = String(value);
@@ -223,7 +224,6 @@ const validateForm = () => {
     errors.value.harvest_date = $t('manageCrops.validation.harvestDateRequired');
   }
 
-  // Only validate field and days when creating a new crop
   if (!isEditing.value) {
     if (!formData.value.field.trim()) {
       errors.value.field = $t('manageCrops.validation.fieldRequired');

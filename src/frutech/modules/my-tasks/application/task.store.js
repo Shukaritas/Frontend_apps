@@ -8,7 +8,10 @@ import { useDashboardStore } from '@/frutech/modules/dashboard/stores/dashboard.
 const repository = new TaskApiRepository();
 const assembler = new TaskAssembler();
 
-
+/**
+ * @store useTaskStore
+ * @description Pinia store to manage tasks state and actions.
+ */
 export const useTaskStore = defineStore('tasks', () => {
     const tasks = ref([]);
     const isLoading = ref(false);
@@ -19,7 +22,9 @@ export const useTaskStore = defineStore('tasks', () => {
     const overdueTasks = computed(() => tasks.value.filter((t) => t.isOverdue));
     const taskCount = computed(() => tasks.value.length);
 
-
+    /**
+     * Sorts tasks by due date.
+     */
     const sortedTasks = computed(() => {
         if (!tasks.value.length) return [];
         return [...tasks.value].sort((a, b) => {
@@ -29,14 +34,20 @@ export const useTaskStore = defineStore('tasks', () => {
         });
     });
 
-
+    /**
+     * Parses a date string in DD/MM format.
+     * @param {string} dateStr - Date string in DD/MM format.
+     * @returns {Date}
+     */
     function parseDueDate(dateStr) {
         const [day, month] = dateStr.split('/').map(Number);
         const year = new Date().getFullYear();
         return new Date(year, month - 1, day);
     }
 
-
+    /**
+     * Fetches all tasks from the API.
+     */
     async function fetchTasks() {
         isLoading.value = true;
         error.value = null;
@@ -51,7 +62,10 @@ export const useTaskStore = defineStore('tasks', () => {
         }
     }
 
-
+    /**
+     * Creates a new task.
+     * @param {object} taskData - Object with task data { description, dueDate, field }.
+     */
     async function createTask(taskData) {
         isLoading.value = true;
         error.value = null;
@@ -80,7 +94,11 @@ export const useTaskStore = defineStore('tasks', () => {
         }
     }
 
-
+    /**
+     * Updates an existing task.
+     * @param {number} taskId - The ID of the task to update.
+     * @param {object} dataToUpdate - Object with new data { description, dueDate, field }.
+     */
     async function updateTask(taskId, dataToUpdate) {
         isLoading.value = true;
         error.value = null;
@@ -103,7 +121,10 @@ export const useTaskStore = defineStore('tasks', () => {
         }
     }
 
-
+    /**
+     * Toggles the completion status of a task.
+     * @param {number} taskId - The ID of the task to toggle.
+     */
     async function toggleTaskCompletion(taskId) {
         isLoading.value = true;
         error.value = null;
@@ -128,7 +149,10 @@ export const useTaskStore = defineStore('tasks', () => {
         }
     }
 
-
+    /**
+     * Deletes a task.
+     * @param {number} taskId - The ID of the task to delete.
+     */
     async function deleteTask(taskId) {
         isLoading.value = true;
         error.value = null;
@@ -149,7 +173,9 @@ export const useTaskStore = defineStore('tasks', () => {
         }
     }
 
-
+    /**
+     * Clears the error state.
+     */
     function clearError() {
         error.value = null;
     }

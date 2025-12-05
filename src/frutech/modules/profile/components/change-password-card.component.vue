@@ -27,7 +27,9 @@
 </template>
 
 <script setup>
-
+/**
+ * @author Estefano Solis
+ */
 import { reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Card from 'primevue/card';
@@ -39,7 +41,10 @@ const emit = defineEmits(['save']);
 const form = reactive({ currentPassword: '', newPassword: '', confirmPassword: '' });
 const errors = reactive({});
 
-
+/**
+ * Validates the change password form fields.
+ * @returns {boolean} True if the form is valid.
+ */
 const validate = () => {
   Object.keys(errors).forEach(key => delete errors[key]);
   let isValid = true;
@@ -58,7 +63,9 @@ const validate = () => {
   return isValid;
 }
 
-
+/**
+ * Validates and emits the event to save the new password.
+ */
 const save = () => {
   if (validate()) {
     emit('save', { ...form });

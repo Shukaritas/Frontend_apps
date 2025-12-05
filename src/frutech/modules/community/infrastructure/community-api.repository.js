@@ -4,6 +4,9 @@ import http from '@/services/http-common.js';
 
 const COMMUNITY_RECOMMENDATION_ENDPOINT = import.meta.env.VITE_ENDPOINT_COMMUNITY_RECOMMENDATION;
 
+/**
+ *  CommunityRepository implementation using real HTTP API.
+ */
 export class CommunityApiRepository extends CommunityRepository {
   async getRecommendations() {
     const resp = await http.get(COMMUNITY_RECOMMENDATION_ENDPOINT);
@@ -29,6 +32,7 @@ export class CommunityApiRepository extends CommunityRepository {
   }
 
   async createRecommendation(payload) {
+    // payload: { userName, comment }
     if (!payload || !payload.userName || !payload.comment) {
       throw new Error('Payload inválido para crear comentario');
     }
@@ -36,6 +40,7 @@ export class CommunityApiRepository extends CommunityRepository {
       userName: payload.userName,
       comment: payload.comment
     });
+    // Mapear respuesta a entidad
     const data = resp.data || {};
     return new CommunityRecommendation(
       data.id,
@@ -45,16 +50,22 @@ export class CommunityApiRepository extends CommunityRepository {
     );
   }
 
+  /**
+   * Actualiza el contenido de un comentario existente.
+   * @param {number} id - ID del comentario a actualizar
+   * @param {string} comment - Nuevo texto del comentario
+   * @returns {Promise<CommunityRecommendation>}
+   */
   async updateCommentContent(id, comment) {
     if (!id || !comment || comment.trim().length === 0) {
       throw new Error('ID y contenido del comentario son requeridos');
     }
-    const resp = await http.put(`${COMMUNITY_RECOMMENDATION_ENDPOINT}/${id}`, {
+    const resp = await http.patch(`${COMMUNITY_RECOMMENDATION_ENDPOINT}/${id}/content`, {
       comment: comment.trim()
     });
     const data = resp.data || {};
     return new CommunityRecommendation(
-      data.id,
+      data.id || id,
       data.userName || data.user || 'Community',
       data.commentDate || data.CommentDate || '',
       data.comment || data.description || data.text || comment

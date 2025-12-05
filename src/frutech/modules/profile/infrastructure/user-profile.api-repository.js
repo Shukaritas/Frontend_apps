@@ -4,11 +4,21 @@ import { UserProfile } from '../domain/models/user-profile.model';
 
 const USERS_ENDPOINT = import.meta.env.VITE_ENDPOINT_USERS;
 
-
+/**
+ * @class UserProfileApiRepository
+ * @classdesc Implementación contra API .NET real.
+ * Endpoints utilizados (Swagger):
+ *  - GET    /api/v1/users/{id}
+ *  - PUT    /api/v1/users/{id}/profile
+ *  - PUT    /api/v1/users/{id}/password
+ *  - DELETE /api/v1/users/{id}
+ */
 export class UserProfileApiRepository extends UserProfileRepository {
     endpoint = USERS_ENDPOINT;
 
-
+    /**
+     * Mapea UserResource (API) a entidad de dominio.
+     */
     apiToDomain(api) {
         const id = api.id ?? api.Id;
         const name = api.userName ?? api.username ?? api.name ?? api.UserName ?? api.Name;
@@ -19,10 +29,12 @@ export class UserProfileApiRepository extends UserProfileRepository {
         return new UserProfile({ id: Number(id), name, email, phoneNumber, identificator, password });
     }
 
-
+    /**
+     * Mapea entidad de dominio a payload de API (camelCase).
+     */
     domainToProfilePayload(entity) {
         return {
-            userName: entity.name, // backend espera UserName
+            userName: entity.name,
             email: entity.email,
             phoneNumber: entity.phoneNumber,
         };

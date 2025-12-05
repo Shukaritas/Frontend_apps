@@ -29,7 +29,11 @@
 </template>
 
 <script setup>
-
+/**
+ * @file Sidebar Component
+ * @description A responsive navigation sidebar that displays links with icons.
+ * It features a collapsibledesign and handles language translations for its items reactively.
+ */
 import { ref, watch, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useLayoutStore } from '@/stores/layout.store';
@@ -37,7 +41,10 @@ import { useLayoutStore } from '@/stores/layout.store';
 const layoutStore = useLayoutStore();
 const { t, locale } = useI18n({ useScope: 'global' });
 
-
+/**
+ * Computed property que devuelve la ubicación formateada o un mensaje por defecto.
+ * Respeta la privacidad del usuario.
+ */
 const locationDisplay = computed(() => {
   if (!layoutStore.isLocationPublic) return t('sidebar.location.anonymous');
   if (!layoutStore.userLocation) return t('sidebar.location.loading');
@@ -48,7 +55,10 @@ const locationDisplay = computed(() => {
   return t('sidebar.location.unknown');
 });
 
-
+/**
+ * @const {Array<object>} baseNavItems
+ * @description A static array of navigation item objects, each containing a translation key, icon name, and route.
+ */
 const baseNavItems = [
   { labelKey: 'sidebar.dashboard', icon: 'dashboard', route: '/dashboard' },
   { labelKey: 'sidebar.manageCrops', icon: 'manage-crops', route: '/manage-crops' },
@@ -57,10 +67,17 @@ const baseNavItems = [
   { labelKey: 'sidebar.community', icon: 'community', route: '/community' },
 ];
 
-
+/**
+ * @type {import('vue').Ref<Array<object>>}
+ * @description A reactive reference to the array of navigation items that will be rendered.
+ * This array is updated with translated labels whenever the locale changes.
+ */
 const navItems = ref([]);
 
-
+/**
+ * Translates the labels of the base navigation items and updates the reactive `navItems` array.
+ * @function
+ */
 const translateNavItems = () => {
   navItems.value = baseNavItems.map(item => ({
     ...item,
@@ -68,10 +85,17 @@ const translateNavItems = () => {
   }));
 };
 
-
+/**
+ * Watches for changes in the global `locale` and re-translates the navigation items.
+ * The `immediate: true` option ensures it runs once on component mount.
+ */
 watch(locale, translateNavItems, { immediate: true });
 
-
+/**
+ * Generates the correct URL for a given SVG icon name from the assets folder.
+ * @param {string} name - The name of the SVG file (without extension).
+ * @returns {string} The resolved URL for the asset.
+ */
 const getIconUrl = (name) => {
   return new URL(`../../assets/${name}.svg`, import.meta.url).href;
 };

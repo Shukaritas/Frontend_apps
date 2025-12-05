@@ -119,7 +119,6 @@ watch(() => props.task, (newTask) => {
 const handleSubmit = () => {
   submitted.value = true;
   
-  // En modo edición, no se requiere el campo "field" ya que no es editable
   const isValid = formData.value.description && formData.value.dueDate &&
                   (isEditMode.value || formData.value.field);
 

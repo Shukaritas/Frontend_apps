@@ -8,6 +8,7 @@
       <CommunityCommentList @edit="handleEditComment" />
     </div>
 
+    <!-- Dialog mejorado con modo edición -->
     <Dialog
       v-model:visible="showDialog"
       :header="editingComment ? $t('community.actions.editComment') : $t('community.actions.newComment')"
@@ -66,7 +67,7 @@ const showDialog = ref(false);
 const newComment = ref('');
 const submitAttempt = ref(false);
 const posting = ref(false);
-const editingComment = ref(null);
+const editingComment = ref(null); // Guarda el comentario que se está editando
 
 onMounted(async () => {
   await communityStore.fetchRecommendations();
@@ -99,9 +100,11 @@ async function onSubmitComment() {
   posting.value = true;
   try {
     if (editingComment.value) {
+      // Modo edición
       await communityStore.editComment(editingComment.value.id, newComment.value);
       toast.add({ severity: 'success', summary: t('community.toasts.updated'), life: 2500 });
     } else {
+      // Modo creación
       await communityStore.createComment(newComment.value);
       toast.add({ severity: 'success', summary: t('community.toasts.posted'), life: 2500 });
     }

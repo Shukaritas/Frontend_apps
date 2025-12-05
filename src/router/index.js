@@ -1,3 +1,7 @@
+/**
+ * @file Vue Router configuration.
+ * @description Configuración de rutas con redirección inicial al Login.
+ */
 
 import { createRouter, createWebHistory } from 'vue-router';
 import MainLayout from '../shared/layouts/main-layout.component.vue';

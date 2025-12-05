@@ -1,3 +1,8 @@
+/**
+ * @file Axios instance configuration for API communication.
+ * @description Configures a global Axios instance pointing to the API backend with JWT authentication support.
+ */
+
 import axios from 'axios';
 
 const baseURL = import.meta.env.VITE_API_URL || '/api';
@@ -35,7 +40,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
     if (error.request) {
-      return Promise.reject(new Error('No se recibió respuesta del servidor.'));
+      return Promise.reject(new Error('No response received from server.'));
     }
     return Promise.reject(new Error(error.message));
   }

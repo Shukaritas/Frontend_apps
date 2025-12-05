@@ -1,5 +1,8 @@
 import { CommunityRecommendationDTO } from './community-recommendation.dto.js';
 
+/**
+ * Assembler for converting between CommunityRecommendation entities and DTOs.
+ */
 export class CommunityRecommendationAssembler {
   static toDTO(entity) {
     return new CommunityRecommendationDTO(

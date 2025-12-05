@@ -7,33 +7,42 @@ import { useAuthStore } from '@/stores/auth.store.js';
 const repository = new UserProfileApiRepository();
 const assembler = new UserProfileAssembler();
 
-
+/**
+ * @store useUserProfileStore
+ * @description Pinia store for managing user profile state.
+ * Uses DDD pattern with repository and assembler for data transformation.
+ */
 export const useUserProfileStore = defineStore('user-profile', () => {
     const profile = ref(null);
     const loading = ref(false);
     const error = ref(null);
 
     const hasProfile = computed(() => !!profile.value);
-    const isLoading = computed(() => loading.value); // alias para la página que usa isLoading
+    const isLoading = computed(() => loading.value);
 
-
+    /**
+     * Fetches the user profile from the API repository.
+     * @param {number} userId - The user ID to fetch
+     */
     async function fetchProfile(userId) {
         loading.value = true;
         error.value = null;
         try {
             const profileEntity = await repository.getById(userId);
-
             profile.value = assembler.toDTO(profileEntity);
-
         } catch (err) {
-            error.value = 'No se pudo cargar la información del perfil.';
+            error.value = 'Could not load profile information.';
             console.error(err);
         } finally {
             loading.value = false;
         }
     }
 
-
+    /**
+     * Updates the user's personal information.
+     * @param {Object} dataToUpdate - Updated user data { name, phoneNumber, identificator }
+     * @returns {Promise<Object>} Object indicating if email was changed
+     */
     async function updateProfile(dataToUpdate) {
         if (!profile.value) return;
         loading.value = true;
@@ -57,7 +66,7 @@ export const useUserProfileStore = defineStore('user-profile', () => {
 
             profile.value = assembler.toDTO(updatedEntity);
 
-            if (!emailChanged) { // aún no se ha marcado cambio de email
+            if (!emailChanged) {
                 const authStore = useAuthStore();
                 if (authStore.user) {
                     const newName = updatedEntity.name || profile.value.name;
@@ -78,7 +87,7 @@ export const useUserProfileStore = defineStore('user-profile', () => {
                 authStore.logout();
             }
         } catch (err) {
-            error.value = 'No se pudo actualizar el perfil.';
+            error.value = 'Could not update profile.';
             console.error(err);
             throw err;
         } finally {
@@ -87,7 +96,10 @@ export const useUserProfileStore = defineStore('user-profile', () => {
         return { emailChanged };
     }
 
-
+    /**
+     * Changes the user's password.
+     * @param {Object} passwordData - { currentPassword, newPassword, confirmPassword }
+     */
     async function changePassword({ currentPassword, newPassword, confirmPassword }) {
         if (!profile.value) return;
 
@@ -106,7 +118,9 @@ export const useUserProfileStore = defineStore('user-profile', () => {
         }
     }
 
-
+    /**
+     * Deletes the user's account.
+     */
     async function deleteAccount() {
         if (!profile.value) return;
         loading.value = true;
