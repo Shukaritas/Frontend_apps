@@ -16,6 +16,7 @@ export class UserProfileAssembler {
             email: userProfileEntity.email,
             phoneNumber: userProfileEntity.phoneNumber,
             identificator: userProfileEntity.identificator,
+            roleId: userProfileEntity.roleId || 0,
         };
     }
 }

@@ -101,13 +101,15 @@ export class AuthApiRepository {
       const emailResp = getCI(userBody, 'email') ?? email;
       const phoneNumberRaw = getCI(userBody, 'phoneNumber');
       const identificatorRaw = getCI(userBody, 'identificator');
+      const roleIdRaw = getCI(userBody, 'roleId') ?? getCI(userBody, 'RoleId') ?? getCI(userBody, 'role_id');
       const phoneNumber = typeof phoneNumberRaw === 'string' && /^\+\d+/.test(phoneNumberRaw) ? phoneNumberRaw : '+000000000';
       const identificator = typeof identificatorRaw === 'string' && /^\d{8}$/.test(identificatorRaw) ? identificatorRaw : '00000000';
+      const roleId = roleIdRaw ? Number(roleIdRaw) : 0;
 
-      const user = new User({ id, username, email: emailResp, password: '******', phoneNumber, identificator });
+      const user = new User({ id, username, email: emailResp, password: '******', phoneNumber, identificator, roleId });
 
       if (token) localStorage.setItem('token', token); else localStorage.removeItem('token');
-      localStorage.setItem('user', JSON.stringify({ id: user.id, username: user.username, email: user.email }));
+      localStorage.setItem('user', JSON.stringify({ id: user.id, username: user.username, email: user.email, roleId: user.roleId }));
       return user;
     } catch (error) {
       throw new Error(error.message || 'Error al iniciar sesión');
